@@ -1,0 +1,4 @@
+# Photos of other people stay local unless they agreed to be public.
+*
+!.gitignore
+!.gitkeep
