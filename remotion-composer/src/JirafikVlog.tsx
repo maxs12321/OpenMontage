@@ -51,6 +51,9 @@ export type VlogReveal = {
   items: { src: string; amount: number }[];
   caption?: string;
   fadeOut?: boolean; // false keeps the reveal on screen to the last frame
+  typeTitleSeconds?: number; // type the title out letter by letter (pairs with a typing SFX)
+  counterDelay?: number; // seconds before the counter starts climbing
+  climbSeconds?: number; // how long the counter climbs (pairs with a gauge SFX)
 };
 
 export type JirafikVlogProps = {
@@ -610,7 +613,12 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
   const shown = Math.min(r.items.length - 1, Math.floor(frame / step));
   const prev = shown > 0 ? r.items[shown - 1].amount : 0;
   const cur = r.items[shown].amount;
-  const climb = easeOut((frame - shown * step) / (step * 0.8));
+  const delayF = (r.counterDelay ?? 0) * fps;
+  const climbF = r.climbSeconds ? r.climbSeconds * fps : step * 0.8;
+  const climb = easeOut((frame - shown * step - delayF) / climbF);
+  const titleChars = r.typeTitleSeconds
+    ? Math.floor(r.title.length * Math.min(1, frame / (r.typeTitleSeconds * fps)))
+    : r.title.length;
   const value = prev + (cur - prev) * climb;
   const last = shown === r.items.length - 1;
   const total = r.duration * fps;
@@ -623,7 +631,8 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
       <AbsoluteFill style={{ backgroundColor: `rgba(20,24,58,${0.82 * dim})` }} />
       <AbsoluteFill style={{ alignItems: "center", top: 150 }}>
         <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 44, color: ORANGE, letterSpacing: 3, opacity: dim, textAlign: "center", maxWidth: 980 }}>
-          {r.title}
+          {r.title.slice(0, titleChars)}
+          <span style={{ opacity: 0 }}>{r.title.slice(titleChars)}</span>
         </div>
         <div
           style={{
