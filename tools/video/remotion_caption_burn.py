@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import shutil
 import time
@@ -350,6 +351,11 @@ class RemotionCaptionBurn(BaseTool):
             "--codec=h264", "--crf=18",
             f"--output={str(Path(output_path).resolve())}",
         ]
+        # Lets sandboxes that cannot download Remotion's headless shell
+        # point it at a preinstalled Chromium instead.
+        browser = os.environ.get("REMOTION_BROWSER_EXECUTABLE")
+        if browser:
+            render_cmd.append(f"--browser-executable={browser}")
         self.run_command(render_cmd, cwd=str(root))
 
         if not Path(output_path).exists():
