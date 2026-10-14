@@ -1,0 +1,4 @@
+# Payout screenshots stay local while the repository is public.
+*
+!.gitignore
+!.gitkeep
