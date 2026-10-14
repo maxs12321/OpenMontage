@@ -49,6 +49,7 @@ export type VlogReveal = {
   title: string;
   items: { src: string; amount: number }[];
   caption?: string;
+  fadeOut?: boolean; // false keeps the reveal on screen to the last frame
 };
 
 export type JirafikVlogProps = {
@@ -441,7 +442,10 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
   const value = prev + (cur - prev) * climb;
   const last = shown === r.items.length - 1;
   const total = r.duration * fps;
-  const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const out =
+    r.fadeOut === false
+      ? 1
+      : interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ opacity: out }}>
       <AbsoluteFill style={{ backgroundColor: `rgba(20,24,58,${0.82 * dim})` }} />
@@ -477,7 +481,7 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
             <Img
               src={staticFile(it.src)}
               style={{
-                width: 520,
+                width: r.items.length === 1 ? 640 : 520,
                 borderRadius: 26,
                 border: i === shown ? `8px solid ${ORANGE}` : "8px solid #fff",
                 boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
@@ -595,9 +599,11 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
           <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.22} />
         </Sequence>
       ))}
-      <Sequence from={vf - f(0.3)}>
-        <EndCard card={p.endCard} />
-      </Sequence>
+      {p.endCard.seconds > 0 && (
+        <Sequence from={vf - f(0.3)}>
+          <EndCard card={p.endCard} />
+        </Sequence>
+      )}
     </AbsoluteFill>
   );
 };

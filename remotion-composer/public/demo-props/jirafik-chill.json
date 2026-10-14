@@ -1,6 +1,6 @@
 {
  "videoSrc": "jirafik/chill-cut-v4.mp4",
- "videoDuration": 32.14,
+ "videoDuration": 31.29,
  "cuts": [
   0.75,
   1.55,
@@ -504,34 +504,27 @@
  ],
  "reveal": {
   "start": 27.69,
-  "duration": 4.4,
-  "title": "МОИ ВЫПЛАТЫ OZON БАНКА",
-  "caption": "реальные скрины из моего кабинета",
+  "duration": 3.6,
+  "title": "ВЫПЛАТЫ ЗА РЕКОМЕНДАЦИИ",
+  "caption": "личный кабинет Ozon Банка · реальный скрин",
   "items": [
-   {
-    "src": "jirafik/rev-ozon-37500.jpg",
-    "amount": 37500
-   },
    {
     "src": "jirafik/rev-ozon-75000.jpg",
     "amount": 75000
-   },
-   {
-    "src": "jirafik/rev-ozon-150500.jpg",
-    "amount": 150500
    }
-  ]
+  ],
+  "fadeOut": false
  },
  "hook": {
   "tag": "ВЛОГ · ЖИРАФИК ТРАФИК",
   "line1": "День арбитражника",
   "line2": "на банках",
   "until": 1.75,
-  "teaser": "В конце покажу выплаты 👀"
+  "teaser": "В конце покажу выплату 👀"
  },
  "captionsFrom": 1.5,
  "endCard": {
-  "seconds": 2.6,
+  "seconds": 0,
   "question": "А как выглядит твой рабочий день?",
   "handles": [
    "TG · TikTok  @jirafiktrafik",
