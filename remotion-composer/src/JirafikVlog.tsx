@@ -45,6 +45,25 @@ export type JirafikVlogProps = {
   hook: { tag: string; line1: string; line2: string; until: number };
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
+  // Camera feel. Defaults are the calm look the brand asked for; raise them
+  // only for deliberately energetic edits.
+  motion?: {
+    push?: number; // total slow push-in per shot (0.04 = 4 %)
+    alternate?: boolean; // alternate push-in / pull-out between shots
+    punch?: number; // extra zoom kick on each cut
+    blur?: number; // motion blur on each cut, px
+    flash?: boolean; // white flash on cold-open cuts
+    emphasisZoom?: number; // zoom on emphasis words
+  };
+};
+
+const DEFAULT_MOTION = {
+  push: 0.04,
+  alternate: false,
+  punch: 0,
+  blur: 0,
+  flash: false,
+  emphasisZoom: 0.05,
 };
 
 export const calculateJirafikVlogMetadata: CalculateMetadataFunction<
@@ -68,20 +87,24 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const shotStart = bounds[i];
   const shotLen = Math.max(bounds[i + 1] - shotStart, 0.1);
   const local = t - shotStart;
+  const m = { ...DEFAULT_MOTION, ...p.motion };
+  // Ease the push so a shot starts and settles gently instead of drifting linearly.
   const prog = Math.min(local / shotLen, 1);
-  const push = i % 2 === 0 ? 1.03 + 0.06 * prog : 1.09 - 0.06 * prog;
+  const eased = prog * prog * (3 - 2 * prog);
+  const pullOut = m.alternate && i % 2 === 1;
+  const push = pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased;
   const punchT = Math.min(local / 0.22, 1);
-  const punch = i === 0 ? 0 : 0.14 * Math.pow(1 - punchT, 2);
-  const blur = i === 0 ? 0 : 7 * Math.pow(1 - punchT, 2);
+  const punch = i === 0 ? 0 : m.punch * Math.pow(1 - punchT, 2);
+  const blur = i === 0 ? 0 : m.blur * Math.pow(1 - punchT, 2);
   let emph = 0;
   for (const e of p.emphasis) {
-    if (t >= e.start && t <= e.end + 0.3) {
-      const inn = easeOut((t - e.start) / 0.18);
-      const out = 1 - easeOut((t - e.end) / 0.3);
-      emph = Math.max(emph, 0.1 * Math.min(inn, out));
+    if (t >= e.start && t <= e.end + 0.45) {
+      const inn = easeOut((t - e.start) / 0.35);
+      const out = 1 - easeOut((t - e.end) / 0.45);
+      emph = Math.max(emph, m.emphasisZoom * Math.min(inn, out));
     }
   }
-  const flash = i > 0 && t < p.hook.until ? Math.max(0, 0.55 - local * 5) : 0;
+  const flash = m.flash && i > 0 && t < p.hook.until ? Math.max(0, 0.55 - local * 5) : 0;
   return (
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: "#000" }}>
       <AbsoluteFill
@@ -240,7 +263,7 @@ const Captions: React.FC<{ words: VlogWord[]; from: number }> = ({ words, from }
 const Sticker: React.FC<{ s: VlogSticker; index: number }> = ({ s, index }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const inn = spring({ frame, fps, config: { damping: 10, stiffness: 200 } });
+  const inn = spring({ frame, fps, config: { damping: 16, stiffness: 170 } });
   const total = s.duration * fps;
   const out = interpolate(frame, [total - 7, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const tilt = (index % 2 === 0 ? -1 : 1) * 4;
