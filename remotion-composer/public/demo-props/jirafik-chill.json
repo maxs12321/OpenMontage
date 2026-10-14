@@ -19,7 +19,6 @@
   26.27
  ],
  "whooshAt": [
-  0.75,
   1.55
  ],
  "emphasis": [
@@ -152,7 +151,8 @@
   {
    "text": "созвон,",
    "start": 7.56,
-   "end": 7.96
+   "end": 7.96,
+   "key": true
   },
   {
    "text": "доработать",
@@ -177,7 +177,8 @@
   {
    "text": "РКО,",
    "start": 9.24,
-   "end": 9.72
+   "end": 9.72,
+   "key": true
   },
   {
    "text": "чтобы",
@@ -267,7 +268,8 @@
   {
    "text": "телефон",
    "start": 14.88,
-   "end": 15.24
+   "end": 15.24,
+   "key": true
   },
   {
    "text": "и",
@@ -287,7 +289,8 @@
   {
    "text": "настраивать.",
    "start": 15.96,
-   "end": 16.69
+   "end": 16.69,
+   "key": true
   },
   {
    "text": "Только",
@@ -347,7 +350,8 @@
   {
    "text": "План",
    "start": 19.61,
-   "end": 20.05
+   "end": 20.05,
+   "key": true
   },
   {
    "text": "есть.",
@@ -382,7 +386,8 @@
   {
    "text": "отдохнуть.",
    "start": 22.7,
-   "end": 23.2
+   "end": 23.2,
+   "key": true
   },
   {
    "text": "Сегодня",
@@ -397,7 +402,8 @@
   {
    "text": "чилловый",
    "start": 25.31,
-   "end": 25.83
+   "end": 25.83,
+   "key": true
   },
   {
    "text": "день:",
@@ -427,7 +433,8 @@
   {
    "text": "отчёты",
    "start": 27.79,
-   "end": 28.07
+   "end": 28.07,
+   "key": true
   },
   {
    "text": "к",
@@ -456,24 +463,6 @@
    "start": 13.5,
    "duration": 1.13,
    "variant": "avatar"
-  },
-  {
-   "text": "✅ План есть",
-   "start": 19.56,
-   "duration": 1.4,
-   "variant": "orange"
-  },
-  {
-   "text": "🎮 Отдых",
-   "start": 22.599999999999998,
-   "duration": 1.9,
-   "variant": "navy"
-  },
-  {
-   "text": "☕ Чилл-день",
-   "start": 25.259999999999998,
-   "duration": 1.4,
-   "variant": "orange"
   }
  ],
  "inserts": [
@@ -519,10 +508,15 @@
   "tag": "ВЛОГ · ЖИРАФИК ТРАФИК",
   "line1": "День арбитражника",
   "line2": "на банках",
-  "until": 1.75,
-  "teaser": "В конце покажу выплату 👀"
+  "until": 2.3,
+  "teaser": "Скрин выплаты — в конце 👀",
+  "flash": {
+   "value": "75 000 ₽",
+   "label": "выплата за рекомендации",
+   "until": 0.65
+  }
  },
- "captionsFrom": 1.5,
+ "captionsFrom": 2.25,
  "endCard": {
   "seconds": 0,
   "question": "А как выглядит твой рабочий день?",
@@ -538,5 +532,68 @@
   "blur": 0,
   "flash": false,
   "emphasisZoom": 0.05
- }
+ },
+ "sfx": [
+  {
+   "at": 0.02,
+   "src": "jirafik/sfx-coins.wav",
+   "volume": 0.35
+  },
+  {
+   "at": 0.55,
+   "src": "jirafik/whoosh.wav",
+   "volume": 0.2
+  },
+  {
+   "at": 7.56,
+   "src": "jirafik/sfx-click.wav",
+   "volume": 0.5
+  },
+  {
+   "at": 8.79,
+   "src": "jirafik/sfx-typing.wav",
+   "volume": 0.32
+  },
+  {
+   "at": 14.88,
+   "src": "jirafik/sfx-click.wav",
+   "volume": 0.5
+  },
+  {
+   "at": 15.96,
+   "src": "jirafik/sfx-typing.wav",
+   "volume": 0.3
+  },
+  {
+   "at": 19.61,
+   "src": "jirafik/sfx-pop.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 22.6,
+   "src": "jirafik/whoosh.wav",
+   "volume": 0.3
+  },
+  {
+   "at": 25.31,
+   "src": "jirafik/sfx-pop.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 27.49,
+   "src": "jirafik/sfx-typing.wav",
+   "volume": 0.28
+  },
+  {
+   "at": 27.89,
+   "src": "jirafik/sfx-riser.wav",
+   "volume": 0.22
+  },
+  {
+   "at": 29.61,
+   "src": "jirafik/sfx-coins.wav",
+   "volume": 0.4
+  }
+ ],
+ "captionStyle": "bold"
 }

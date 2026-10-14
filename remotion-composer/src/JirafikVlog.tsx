@@ -26,7 +26,7 @@ const LIGHT = "#F5F5F7";
 const HEAD = "Lora, serif";
 const BODY = "Inter, 'Noto Color Emoji', sans-serif";
 
-export type VlogWord = { text: string; start: number; end: number };
+export type VlogWord = { text: string; start: number; end: number; key?: boolean };
 export type VlogSticker = {
   text: string;
   start: number;
@@ -60,7 +60,17 @@ export type JirafikVlogProps = {
   emphasis: { start: number; end: number }[];
   words: VlogWord[];
   stickers: VlogSticker[];
-  hook: { tag: string; line1: string; line2: string; until: number; teaser?: string };
+  hook: {
+    tag: string;
+    line1: string;
+    line2: string;
+    until: number;
+    teaser?: string;
+    // optional result flash before the title: shows the payoff first
+    flash?: { value: string; label: string; until: number };
+  };
+  captionStyle?: "plate" | "bold";
+  sfx?: { at: number; src: string; volume?: number }[];
   inserts?: VlogInsert[];
   reveal?: VlogReveal;
   captionsFrom: number;
@@ -156,66 +166,94 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
 const Hook: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const pop = spring({ frame, fps, config: { damping: 11, stiffness: 160 } });
-  const line2 = spring({ frame: frame - 7, fps, config: { damping: 10, stiffness: 180 } });
-  const outStart = hook.until * fps - 8;
+  const pop = spring({ frame, fps, config: { damping: 12, stiffness: 180 } });
+  const line2 = spring({ frame: frame - 6, fps, config: { damping: 10, stiffness: 170 } });
+  const outStart = (hook.until - (hook.flash?.until ?? 0)) * fps - 8;
   const out = interpolate(frame, [outStart, outStart + 8], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const shadow = "0 6px 24px rgba(0,0,0,0.7), 0 0 3px rgba(0,0,0,0.9)";
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: 470 }}>
-      <div
-        style={{
-          transform: `scale(${(0.6 + 0.4 * pop) * (0.85 + 0.15 * out)})`,
-          opacity: out,
-          background: "rgba(20,24,58,0.92)",
-          borderLeft: `14px solid ${ORANGE}`,
-          borderRadius: 30,
-          padding: "34px 56px 40px",
-          textAlign: "center",
-          boxShadow: "0 18px 50px rgba(0,0,0,0.45)",
-        }}
-      >
-        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 38, letterSpacing: 4, color: ORANGE }}>
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", opacity: out }}>
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse at center, rgba(10,12,30,0.55) 0%, rgba(10,12,30,0) 65%)" }} />
+      <div style={{ textAlign: "center", transform: `scale(${(0.7 + 0.3 * pop) * (0.9 + 0.1 * out)})` }}>
+        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 36, letterSpacing: 5, color: ORANGE, textShadow: shadow }}>
           {hook.tag}
         </div>
-        <div style={{ fontFamily: HEAD, fontWeight: 700, fontSize: 92, color: "#fff", lineHeight: 1.1, marginTop: 8 }}>
+        <div style={{ fontFamily: BODY, fontWeight: 900, fontSize: 96, color: "#fff", textTransform: "uppercase", lineHeight: 1.0, marginTop: 10, textShadow: shadow }}>
           {hook.line1}
         </div>
         <div
           style={{
             fontFamily: HEAD,
+            fontStyle: "italic",
             fontWeight: 700,
-            fontSize: 104,
+            fontSize: 140,
             color: ORANGE,
-            lineHeight: 1.1,
+            lineHeight: 1.05,
+            textShadow: `0 0 30px rgba(242,138,46,0.75), ${shadow}`,
+            WebkitTextStroke: `5px ${NAVY}`,
+            paintOrder: "stroke fill",
             transform: `translateY(${(1 - line2) * 40}px) scale(${0.7 + 0.3 * line2})`,
             opacity: Math.min(1, line2 * 1.5),
           }}
         >
           {hook.line2}
         </div>
+        {hook.teaser && (
+          <div
+            style={{
+              display: "inline-block",
+              marginTop: 30,
+              opacity: Math.min(1, Math.max(0, (frame - 12) / 6)),
+              background: ORANGE,
+              color: NAVY,
+              fontFamily: BODY,
+              fontWeight: 800,
+              fontSize: 44,
+              padding: "12px 30px",
+              borderRadius: 40,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+            }}
+          >
+            {hook.teaser}
+          </div>
+        )}
       </div>
-      {hook.teaser && (
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Hook flash: result first (big number stamps in), then the title takes over
+// ---------------------------------------------------------------------------
+const HookFlash: React.FC<{ flash: NonNullable<JirafikVlogProps["hook"]["flash"]> }> = ({ flash }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const stamp = spring({ frame, fps, config: { damping: 9, stiffness: 220 } });
+  const total = flash.until * fps;
+  const out = interpolate(frame, [total - 5, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ opacity: out }}>
+      <AbsoluteFill style={{ backgroundColor: "rgba(20,24,58,0.72)" }} />
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
         <div
           style={{
-            marginTop: 26,
-            opacity: out * Math.min(1, Math.max(0, (frame - 14) / 6)),
-            transform: `translateY(${Math.max(0, 20 - (frame - 14) * 4)}px)`,
-            background: ORANGE,
-            color: NAVY,
-            fontFamily: BODY,
-            fontWeight: 800,
-            fontSize: 46,
-            padding: "12px 30px",
-            borderRadius: 40,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+            fontFamily: HEAD,
+            fontWeight: 700,
+            fontSize: 190,
+            color: GOLD,
+            transform: `scale(${1.7 - 0.7 * stamp}) rotate(${(1 - stamp) * -6}deg)`,
+            textShadow: "0 10px 40px rgba(0,0,0,0.6)",
           }}
         >
-          {hook.teaser}
+          {flash.value}
         </div>
-      )}
+        <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 52, color: "#fff", textTransform: "uppercase", opacity: stamp }}>
+          {flash.label}
+        </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
@@ -224,7 +262,7 @@ const Hook: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
 // Captions: pages of up to 3 words, active word orange + bounce
 // ---------------------------------------------------------------------------
 type Page = { words: VlogWord[]; start: number; end: number };
-const buildPages = (words: VlogWord[]): Page[] => {
+const buildPages = (words: VlogWord[], maxWords = 3): Page[] => {
   const pages: Page[] = [];
   let cur: VlogWord[] = [];
   const flush = () => {
@@ -233,7 +271,7 @@ const buildPages = (words: VlogWord[]): Page[] => {
   };
   words.forEach((w, i) => {
     const prev = words[i - 1];
-    if (cur.length && (cur.length >= 3 || (prev && w.start - prev.end > 0.35))) flush();
+    if (cur.length && (cur.length >= maxWords || (w.key && cur.length > 0) || (prev?.key ?? false) || (prev && w.start - prev.end > 0.35))) flush();
     cur.push(w);
     if (/[.,:!?…]$/.test(w.text)) flush();
   });
@@ -244,17 +282,65 @@ const buildPages = (words: VlogWord[]): Page[] => {
   return pages;
 };
 
-const Captions: React.FC<{ words: VlogWord[]; from: number }> = ({ words, from }) => {
+const BOLD_SHADOW = "0 4px 14px rgba(0,0,0,0.75), 0 0 3px rgba(0,0,0,0.9)";
+
+const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" }> = ({
+  words,
+  from,
+  variant = "plate",
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
-  const pages = React.useMemo(() => buildPages(words.filter((w) => w.start >= from)), [words, from]);
+  const pages = React.useMemo(
+    () => buildPages(words.filter((w) => w.start >= from), variant === "bold" ? 2 : 3),
+    [words, from, variant],
+  );
   // Latest page that has started, so the next page replaces the current one
   // exactly on its first word instead of after the linger window.
   const page = [...pages].reverse().find((pg) => t >= pg.start - 0.04);
   if (!page || t >= page.end + 0.12) return null;
   const pf = Math.round((t - page.start) * fps);
   const pagePop = spring({ frame: pf, fps, config: { damping: 12, stiffness: 220 } });
+  if (variant === "bold") {
+    return (
+      <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", top: 1250 }}>
+        <div style={{ transform: `scale(${0.85 + 0.15 * pagePop})`, maxWidth: 980, textAlign: "center", lineHeight: 1.05 }}>
+          {page.words.map((w, i) => {
+            const spoken = t >= w.start - 0.04;
+            if (!spoken) return null; // words appear as they are said
+            const wf = Math.round((t - w.start) * fps);
+            const pop = spring({ frame: wf, fps, config: { damping: 10, stiffness: 260 } });
+            const text = w.text.replace(/[,:.]$/, "");
+            return (
+              <span
+                key={i}
+                style={{
+                  display: "inline-block",
+                  margin: "0 14px",
+                  transform: `scale(${0.6 + 0.4 * pop}) translateY(${(1 - pop) * 20}px)`,
+                  ...(w.key
+                    ? {
+                        fontFamily: HEAD,
+                        fontStyle: "italic",
+                        fontWeight: 700,
+                        fontSize: 124,
+                        color: ORANGE,
+                        WebkitTextStroke: `6px ${NAVY}`,
+                        paintOrder: "stroke fill",
+                      }
+                    : { fontFamily: BODY, fontWeight: 900, fontSize: 82, color: "#fff", textTransform: "uppercase" as const }),
+                  textShadow: BOLD_SHADOW,
+                }}
+              >
+                {text}
+              </span>
+            );
+          })}
+        </div>
+      </AbsoluteFill>
+    );
+  }
   return (
     <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", top: 1290 }}>
       <div
@@ -578,7 +664,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
             <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.12} />
           </Sequence>
         ))}
-        <Captions words={p.words} from={p.captionsFrom} />
+        <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />
         {p.reveal && (
           <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
             <Reveal r={p.reveal} />
@@ -589,11 +675,21 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
             ))}
           </Sequence>
         )}
-        <Sequence durationInFrames={f(p.hook.until)}>
+        {p.hook.flash && (
+          <Sequence durationInFrames={f(p.hook.flash.until)}>
+            <HookFlash flash={p.hook.flash} />
+          </Sequence>
+        )}
+        <Sequence from={f(p.hook.flash?.until ?? 0)} durationInFrames={f(p.hook.until - (p.hook.flash?.until ?? 0))}>
           <Hook hook={p.hook} />
         </Sequence>
         <Progress total={p.videoDuration} />
       </Sequence>
+      {(p.sfx ?? []).map((x, i) => (
+        <Sequence key={`sfx${i}`} from={Math.max(0, f(x.at))} durationInFrames={f(1.2)}>
+          <Audio src={staticFile(x.src)} volume={x.volume ?? 0.3} />
+        </Sequence>
+      ))}
       {p.whooshAt.map((t, i) => (
         <Sequence key={`wh${i}`} from={Math.max(0, f(t - 0.18))} durationInFrames={f(0.4)}>
           <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.22} />
