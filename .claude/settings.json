@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make setup)",
+      "Bash(make install)",
+      "Bash(make venv)",
+      "Bash(make preflight)",
+      "Bash(python3 -m venv:*)",
+      "Bash(uv venv:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "Bash(cp .env.example .env)"
+    ]
+  }
+}
