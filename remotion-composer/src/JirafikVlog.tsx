@@ -25,6 +25,7 @@ const GOLD = "#E3B341";
 const LIGHT = "#F5F5F7";
 const HEAD = "Lora, serif";
 const BODY = "Inter, 'Noto Color Emoji', sans-serif";
+const TITLE = "Oswald, Inter, sans-serif";
 
 export type VlogWord = { text: string; start: number; end: number; key?: boolean };
 export type VlogSticker = {
@@ -69,7 +70,10 @@ export type JirafikVlogProps = {
     // optional result flash before the title: shows the payoff first
     flash?: { value: string; label: string; until: number };
   };
-  captionStyle?: "plate" | "bold";
+  captionStyle?: "plate" | "bold" | "word";
+  // "lower" hook: short two-line condensed title in the lower third that holds
+  // while the speaker says it (reference style); default is the centred card.
+  hookStyle?: "card" | "lower";
   sfx?: { at: number; src: string; volume?: number }[];
   inserts?: VlogInsert[];
   reveal?: VlogReveal;
@@ -226,6 +230,44 @@ const Hook: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
 };
 
 // ---------------------------------------------------------------------------
+// Lower hook: small italic kicker + two big condensed lines, held long enough to read
+// ---------------------------------------------------------------------------
+const HookLower: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const l1 = spring({ frame, fps, config: { damping: 18, stiffness: 140 } });
+  const l2 = spring({ frame: frame - 5, fps, config: { damping: 18, stiffness: 140 } });
+  const kick = spring({ frame: frame - 10, fps, config: { damping: 20, stiffness: 120 } });
+  const total = hook.until * fps;
+  const out = interpolate(frame, [total - 10, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const shadow = "0 4px 18px rgba(0,0,0,0.45)";
+  const line = (v: number): React.CSSProperties => ({
+    fontFamily: TITLE,
+    fontWeight: 700,
+    fontSize: 132,
+    lineHeight: 0.98,
+    textTransform: "uppercase",
+    textShadow: shadow,
+    transform: `translateY(${(1 - v) * 50}px)`,
+    opacity: Math.min(1, v * 1.3),
+  });
+  return (
+    <AbsoluteFill style={{ opacity: out }}>
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(10,12,30,0) 45%, rgba(10,12,30,0.55) 100%)" }} />
+      <div style={{ position: "absolute", left: 70, right: 70, bottom: 330 }}>
+        {hook.teaser && (
+          <div style={{ fontFamily: BODY, fontStyle: "italic", fontWeight: 600, fontSize: 40, color: "#fff", textShadow: shadow, opacity: kick, marginBottom: 6 }}>
+            {hook.teaser}
+          </div>
+        )}
+        <div style={{ ...line(l1), color: ORANGE }}>{hook.line1}</div>
+        <div style={{ ...line(l2), color: "#fff" }}>{hook.line2}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // Hook flash: result first (big number stamps in), then the title takes over
 // ---------------------------------------------------------------------------
 const HookFlash: React.FC<{ flash: NonNullable<JirafikVlogProps["hook"]["flash"]> }> = ({ flash }) => {
@@ -284,7 +326,7 @@ const buildPages = (words: VlogWord[], maxWords = 3): Page[] => {
 
 const BOLD_SHADOW = "0 4px 14px rgba(0,0,0,0.75), 0 0 3px rgba(0,0,0,0.9)";
 
-const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" }> = ({
+const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" | "word" }> = ({
   words,
   from,
   variant = "plate",
@@ -293,7 +335,7 @@ const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | 
   const { fps } = useVideoConfig();
   const t = frame / fps;
   const pages = React.useMemo(
-    () => buildPages(words.filter((w) => w.start >= from), variant === "bold" ? 2 : 3),
+    () => buildPages(words.filter((w) => w.start >= from), variant === "word" ? 1 : variant === "bold" ? 2 : 3),
     [words, from, variant],
   );
   // Latest page that has started, so the next page replaces the current one
@@ -302,6 +344,50 @@ const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | 
   if (!page || t >= page.end + 0.12) return null;
   const pf = Math.round((t - page.start) * fps);
   const pagePop = spring({ frame: pf, fps, config: { damping: 12, stiffness: 220 } });
+  if (variant === "word") {
+    // One word at a time; key words sit on a brand-orange box (reference style).
+    const w = page.words[page.words.length - 1];
+    const text = w.text.replace(/[,:.!?…]$/, "");
+    const wf = Math.round((t - w.start) * fps);
+    const bounce = spring({ frame: wf, fps, config: { damping: 11, stiffness: 240 } });
+    const scale = 0.8 + 0.2 * bounce;
+    return (
+      <AbsoluteFill style={{ alignItems: "center", top: 1190 }}>
+        {w.key ? (
+          <span
+            style={{
+              transform: `scale(${scale * 1.04})`,
+              background: ORANGE,
+              color: NAVY,
+              fontFamily: BODY,
+              fontWeight: 800,
+              fontSize: 66,
+              lineHeight: 1.15,
+              padding: "2px 18px 6px",
+              borderRadius: 6,
+            }}
+          >
+            {text}
+          </span>
+        ) : (
+          <span
+            style={{
+              transform: `scale(${scale})`,
+              color: "#fff",
+              fontFamily: BODY,
+              fontStyle: "italic",
+              fontWeight: 800,
+              fontSize: 62,
+              lineHeight: 1.15,
+              textShadow: "0 2px 10px rgba(0,0,0,0.45)",
+            }}
+          >
+            {text}
+          </span>
+        )}
+      </AbsoluteFill>
+    );
+  }
   if (variant === "bold") {
     return (
       <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", top: 1250 }}>
@@ -655,20 +741,20 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
         {p.stickers.map((s, i) => (
           <Sequence key={`st${i}`} from={f(s.start)} durationInFrames={f(s.duration)}>
             <Sticker s={s} index={i} />
-            <Audio src={staticFile("jirafik/pop.wav")} volume={0.35} />
+            {p.sfx === undefined && <Audio src={staticFile("jirafik/pop.wav")} volume={0.35} />}
           </Sequence>
         ))}
         {(p.inserts ?? []).map((ins, i) => (
           <Sequence key={`in${i}`} from={f(ins.start)} durationInFrames={f(ins.duration)}>
             <PhotoInsert ins={ins} index={i} />
-            <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.12} />
+            {p.sfx === undefined && <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.12} />}
           </Sequence>
         ))}
         <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />
         {p.reveal && (
           <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
             <Reveal r={p.reveal} />
-            {p.reveal.items.map((_, i) => (
+            {(p.sfx === undefined ? p.reveal.items : []).map((_, i) => (
               <Sequence key={`dg${i}`} from={Math.round(i * ((p.reveal!.duration - 1.2) / p.reveal!.items.length) * fps)} durationInFrames={f(0.5)}>
                 <Audio src={staticFile("jirafik/ding.wav")} volume={0.18 + 0.06 * i} />
               </Sequence>
@@ -681,7 +767,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
           </Sequence>
         )}
         <Sequence from={f(p.hook.flash?.until ?? 0)} durationInFrames={f(p.hook.until - (p.hook.flash?.until ?? 0))}>
-          <Hook hook={p.hook} />
+          {p.hookStyle === "lower" ? <HookLower hook={p.hook} /> : <Hook hook={p.hook} />}
         </Sequence>
         <Progress total={p.videoDuration} />
       </Sequence>

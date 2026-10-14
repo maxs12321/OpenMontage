@@ -18,9 +18,7 @@
   25.27,
   26.27
  ],
- "whooshAt": [
-  1.55
- ],
+ "whooshAt": [],
  "emphasis": [
   {
    "start": 22.7,
@@ -167,7 +165,8 @@
   {
    "text": "связки",
    "start": 8.72,
-   "end": 9.08
+   "end": 9.08,
+   "key": true
   },
   {
    "text": "по",
@@ -289,8 +288,7 @@
   {
    "text": "настраивать.",
    "start": 15.96,
-   "end": 16.69,
-   "key": true
+   "end": 16.69
   },
   {
    "text": "Только",
@@ -356,7 +354,8 @@
   {
    "text": "есть.",
    "start": 20.05,
-   "end": 20.74
+   "end": 20.74,
+   "key": true
   },
   {
    "text": "Задачи",
@@ -505,18 +504,13 @@
   "fadeOut": false
  },
  "hook": {
-  "tag": "ВЛОГ · ЖИРАФИК ТРАФИК",
-  "line1": "День арбитражника",
-  "line2": "на банках",
-  "until": 2.3,
-  "teaser": "Скрин выплаты — в конце 👀",
-  "flash": {
-   "value": "75 000 ₽",
-   "label": "выплата за рекомендации",
-   "until": 0.65
-  }
+  "tag": "",
+  "line1": "День",
+  "line2": "арбитражника",
+  "until": 2.4,
+  "teaser": "в конце — скрин выплаты"
  },
- "captionsFrom": 2.25,
+ "captionsFrom": 2.35,
  "endCard": {
   "seconds": 0,
   "question": "А как выглядит твой рабочий день?",
@@ -533,67 +527,7 @@
   "flash": false,
   "emphasisZoom": 0.05
  },
- "sfx": [
-  {
-   "at": 0.02,
-   "src": "jirafik/sfx-coins.wav",
-   "volume": 0.35
-  },
-  {
-   "at": 0.55,
-   "src": "jirafik/whoosh.wav",
-   "volume": 0.2
-  },
-  {
-   "at": 7.56,
-   "src": "jirafik/sfx-click.wav",
-   "volume": 0.5
-  },
-  {
-   "at": 8.79,
-   "src": "jirafik/sfx-typing.wav",
-   "volume": 0.32
-  },
-  {
-   "at": 14.88,
-   "src": "jirafik/sfx-click.wav",
-   "volume": 0.5
-  },
-  {
-   "at": 15.96,
-   "src": "jirafik/sfx-typing.wav",
-   "volume": 0.3
-  },
-  {
-   "at": 19.61,
-   "src": "jirafik/sfx-pop.wav",
-   "volume": 0.4
-  },
-  {
-   "at": 22.6,
-   "src": "jirafik/whoosh.wav",
-   "volume": 0.3
-  },
-  {
-   "at": 25.31,
-   "src": "jirafik/sfx-pop.wav",
-   "volume": 0.4
-  },
-  {
-   "at": 27.49,
-   "src": "jirafik/sfx-typing.wav",
-   "volume": 0.28
-  },
-  {
-   "at": 27.89,
-   "src": "jirafik/sfx-riser.wav",
-   "volume": 0.22
-  },
-  {
-   "at": 29.61,
-   "src": "jirafik/sfx-coins.wav",
-   "volume": 0.4
-  }
- ],
- "captionStyle": "bold"
+ "sfx": [],
+ "captionStyle": "word",
+ "hookStyle": "lower"
 }
