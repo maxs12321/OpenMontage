@@ -112,6 +112,18 @@ class RemotionCaptionBurn(BaseTool):
                 "default": "#22D3EE",
                 "description": "Highlight color for the active word (hex).",
             },
+            "caption_color": {
+                "type": "string",
+                "description": "Color of inactive caption words (CSS color). Defaults to the composition's white.",
+            },
+            "caption_background_color": {
+                "type": "string",
+                "description": "Caption box background (CSS color). Defaults to the composition's translucent black.",
+            },
+            "caption_font_family": {
+                "type": "string",
+                "description": "CSS font-family for captions, e.g. a playbook's body font.",
+            },
             "corrections": {
                 "type": "object",
                 "description": (
@@ -273,6 +285,7 @@ class RemotionCaptionBurn(BaseTool):
         font_size: int,
         highlight_color: str,
         overlays: list[dict] | None = None,
+        caption_style: dict[str, str] | None = None,
     ) -> ToolResult:
         root = self._find_remotion_root()
         if root is None:
@@ -318,6 +331,7 @@ class RemotionCaptionBurn(BaseTool):
             "wordsPerPage": words_per_page,
             "fontSize": font_size,
             "highlightColor": highlight_color,
+            **(caption_style or {}),
         }
         props_dir = root / "public" / "demo-props"
         props_dir.mkdir(parents=True, exist_ok=True)
@@ -473,6 +487,15 @@ class RemotionCaptionBurn(BaseTool):
             return ToolResult(success=False, error="No caption words extracted.")
 
         overlays = inputs.get("overlays")
+        caption_style = {
+            prop: inputs[key]
+            for key, prop in (
+                ("caption_color", "captionColor"),
+                ("caption_background_color", "captionBackgroundColor"),
+                ("caption_font_family", "captionFontFamily"),
+            )
+            if inputs.get(key)
+        }
 
         # Choose render method
         if not force_ffmpeg and self._remotion_available():
@@ -480,6 +503,7 @@ class RemotionCaptionBurn(BaseTool):
                 input_path, output_path, captions,
                 words_per_page, font_size, highlight_color,
                 overlays=overlays,
+                caption_style=caption_style,
             )
         else:
             result = self._render_ffmpeg(input_path, output_path, captions)

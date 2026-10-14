@@ -1,0 +1,107 @@
+identity:
+  name: "Жирафик Трафик"
+  category: custom
+  mood: confident, friendly, honest, light humor
+  pace: fast
+  best_for: "Talking-head videos by Ilya Danilenko about RKO, IP registration and bank-product traffic arbitrage for TikTok, YouTube Shorts, Instagram Reels and Telegram"
+
+visual_language:
+  color_palette:
+    primary: ["#14183A", "#2E4F8F"]
+    accent: ["#F28A2E", "#E3B341"]
+    background: "#14183A"
+    text: "#FFFFFF"
+    muted: "#F5F5F7"
+  composition: "speaker centered in 9:16, text in upper or lower third, never covering the face"
+  texture: clean flat, no grain, no noise
+
+typography:
+  headings:
+    font: "Lora"
+    weight: 700
+    tracking: "-0.01em"
+  body:
+    font: "Inter"
+    weight: 500
+    line_height: 1.4
+  stat_card:
+    font: "Lora"
+    weight: 700
+    size_multiplier: 3.0
+  scale_system: "major_third"
+  weight_matrix:
+    title: 700
+    heading: 700
+    body: 500
+    caption: 700
+
+motion:
+  transitions: [cut, fade, slide-up]
+  animation_style: "snappy ease-out, short and confident, no bounce"
+  pacing_rules:
+    min_scene_hold_seconds: 1.5
+    max_scene_hold_seconds: 8
+    text_card_hold_seconds: 2.5
+    stat_card_hold_seconds: 2.5
+    transition_duration_seconds: 0.25
+  entrance: "fade-up with slight scale (0.95 -> 1.0)"
+  exit: "fade-out"
+
+audio:
+  voice_style: "the speaker's own voice; keep it natural, cut pauses and fluffs, do not speed up the voice"
+  music_mood: "calm lo-fi or light upbeat, never louder than the voice"
+  music_volume: 0.08
+  sfx_style: "rare soft whoosh on text pop-ups, a coin click on money numbers"
+  ducking_threshold_db: -3
+
+asset_generation:
+  image_prompt_prefix: "flat illustration, dark navy #14183A background, orange #F28A2E accents, giraffe in a blue suit mascot style, "
+  image_negative_prompt: "photorealistic, grungy, cluttered, neon, low quality, text artifacts"
+  diagram_style: "rounded cards on navy, orange numbered circles, white Inter text"
+  consistency_anchors:
+    - "Navy #14183A and light #F5F5F7 are the base, orange #F28A2E catches the eye"
+    - "Gold #E3B341 at most one element on screen (a money number, a result)"
+    - "Headings in Lora Bold, everything else in Inter"
+    - "Mascot: giraffe in a blue suit with an RKO gold chain (brand/jirafik-trafik/avatar.png)"
+
+overlays:
+  stat_card:
+    bg: "#14183A"
+    border: "#F28A2E"
+    radius: 16
+    shadow: "0 4px 16px rgba(0,0,0,0.25)"
+  key_term:
+    bg: "#F28A2E"
+    text: "#14183A"
+    radius: 8
+  section_title:
+    bg: "#14183A"
+    text: "#FFFFFF"
+    border: "#F28A2E"
+    radius: 12
+  hero_title:
+    bg: "#14183A"
+    text: "#FFFFFF"
+    highlight: "#E3B341"
+
+quality_rules:
+  - "Captions, name plate and end card: follow brand/jirafik-trafik/README.md"
+  - "Minimum contrast ratio 4.5:1 for all text"
+  - "Gold #E3B341 on at most one element per screen"
+  - "No more than two fonts in a frame: Lora for headings, Inter for the rest"
+  - "Captions never cover the speaker's face; keep them inside the 9:16 safe zone"
+  - "Headings short; on-screen text at most 2-3 lines"
+  - "Address the viewer as 'ты'; no officialese, no 'easy millions' promises, no pressure, no swearing"
+  - "End with a question to the audience or a soft call to subscribe"
+
+chart_palette:
+  - "#F28A2E"
+  - "#2E4F8F"
+  - "#E3B341"
+  - "#F5F5F7"
+  - "#14183A"
+
+color_rules:
+  harmony_type: "complementary"
+  contrast_validation: true
+  colorblind_safe: true

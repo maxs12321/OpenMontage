@@ -35,6 +35,7 @@ orchestration:
 
 compatible_playbooks:
   recommended:
+    - jirafik-trafik
     - clean-professional
   also_works: []
   custom_allowed: true
