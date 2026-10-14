@@ -38,4 +38,5 @@
 | `photos/tea-ceremony-laptop.jpg`, `tea-ceremony-window.jpg` | чай + ноутбук: «работаю в своём темпе», спокойная перебивка |
 | `photos/red-square-walking.jpg` | прогулка по Красной площади — свобода графика, поездки |
 | `photos/me-selfie-sunglasses.jpg` (локально) | селфи в очках — уверенная/дерзкая реакция, юмор |
+| `photos/me-videocall-kitchen.jpg` (локально) | созвон по видео за ноутбуком на кухне — «провели созвон», «начинал с простого» |
 | `memes/friend-snack-night.jpg` (локально) | реакция/юмор, только с согласия человека на фото |
