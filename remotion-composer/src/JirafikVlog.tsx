@@ -34,6 +34,23 @@ export type VlogSticker = {
   variant?: "orange" | "navy" | "avatar";
 };
 
+export type VlogInsert = {
+  src: string; // file in public/
+  start: number;
+  duration: number;
+  label?: string;
+  width?: number; // card width, px
+  aspect?: number; // width / height
+};
+
+export type VlogReveal = {
+  start: number;
+  duration: number;
+  title: string;
+  items: { src: string; amount: number }[];
+  caption?: string;
+};
+
 export type JirafikVlogProps = {
   videoSrc: string;
   videoDuration: number;
@@ -42,7 +59,9 @@ export type JirafikVlogProps = {
   emphasis: { start: number; end: number }[];
   words: VlogWord[];
   stickers: VlogSticker[];
-  hook: { tag: string; line1: string; line2: string; until: number };
+  hook: { tag: string; line1: string; line2: string; until: number; teaser?: string };
+  inserts?: VlogInsert[];
+  reveal?: VlogReveal;
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
   // Camera feel. Defaults are the calm look the brand asked for; raise them
@@ -177,6 +196,25 @@ const Hook: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
           {hook.line2}
         </div>
       </div>
+      {hook.teaser && (
+        <div
+          style={{
+            marginTop: 26,
+            opacity: out * Math.min(1, Math.max(0, (frame - 14) / 6)),
+            transform: `translateY(${Math.max(0, 20 - (frame - 14) * 4)}px)`,
+            background: ORANGE,
+            color: NAVY,
+            fontFamily: BODY,
+            fontWeight: 800,
+            fontSize: 46,
+            padding: "12px 30px",
+            borderRadius: 40,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+          }}
+        >
+          {hook.teaser}
+        </div>
+      )}
     </AbsoluteFill>
   );
 };
@@ -330,6 +368,131 @@ const Sticker: React.FC<{ s: VlogSticker; index: number }> = ({ s, index }) => {
 };
 
 // ---------------------------------------------------------------------------
+// Photo insert: framed card that springs in, drifts slowly, slides out
+// ---------------------------------------------------------------------------
+const PhotoInsert: React.FC<{ ins: VlogInsert; index: number }> = ({ ins, index }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const inn = spring({ frame, fps, config: { damping: 15, stiffness: 150 } });
+  const total = ins.duration * fps;
+  const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const w = ins.width ?? 640;
+  const h = w / (ins.aspect ?? 0.8);
+  const tilt = (index % 2 === 0 ? -1 : 1) * 3;
+  const drift = 1 + 0.05 * (frame / total);
+  return (
+    <AbsoluteFill style={{ alignItems: "center", top: 250 }}>
+      <div
+        style={{
+          transform: `translateY(${(1 - inn) * 120 + (1 - out) * -60}px) scale(${0.85 + 0.15 * inn}) rotate(${tilt * inn}deg)`,
+          opacity: Math.min(inn * 1.4, out),
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            width: w,
+            height: h,
+            borderRadius: 28,
+            overflow: "hidden",
+            border: "10px solid #fff",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
+          }}
+        >
+          <Img src={staticFile(ins.src)} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${drift})` }} />
+        </div>
+        {ins.label && (
+          <div
+            style={{
+              marginTop: -30,
+              background: ORANGE,
+              color: NAVY,
+              fontFamily: BODY,
+              fontWeight: 800,
+              fontSize: 52,
+              padding: "10px 32px",
+              borderRadius: 18,
+              boxShadow: "0 10px 26px rgba(0,0,0,0.35)",
+            }}
+          >
+            {ins.label}
+          </div>
+        )}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Reveal: payout screenshots fan in one by one, counter climbs to the last
+// ---------------------------------------------------------------------------
+const fmt = (n: number) => Math.round(n).toLocaleString("ru-RU").replace(/,/g, " ");
+const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const dim = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: "clamp" });
+  const step = Math.round(((r.duration - 1.2) / r.items.length) * fps);
+  const shown = Math.min(r.items.length - 1, Math.floor(frame / step));
+  const prev = shown > 0 ? r.items[shown - 1].amount : 0;
+  const cur = r.items[shown].amount;
+  const climb = easeOut((frame - shown * step) / (step * 0.8));
+  const value = prev + (cur - prev) * climb;
+  const last = shown === r.items.length - 1;
+  const total = r.duration * fps;
+  const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ opacity: out }}>
+      <AbsoluteFill style={{ backgroundColor: `rgba(20,24,58,${0.82 * dim})` }} />
+      <AbsoluteFill style={{ alignItems: "center", top: 150 }}>
+        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 44, color: ORANGE, letterSpacing: 3, opacity: dim, textAlign: "center", maxWidth: 980 }}>
+          {r.title}
+        </div>
+        <div
+          style={{
+            fontFamily: HEAD,
+            fontWeight: 700,
+            fontSize: 150,
+            lineHeight: 1.1,
+            color: last && climb > 0.98 ? GOLD : "#fff",
+            transform: `scale(${last && climb > 0.98 ? 1.06 : 1})`,
+            opacity: dim,
+          }}
+        >
+          {fmt(value)} ₽
+        </div>
+        {r.caption && (
+          <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 40, color: LIGHT, opacity: dim * 0.9 }}>{r.caption}</div>
+        )}
+      </AbsoluteFill>
+      {r.items.map((it, i) => {
+        const f = frame - i * step;
+        if (f < 0) return null;
+        const s = spring({ frame: f, fps, config: { damping: 14, stiffness: 160 } });
+        const x = (i - (r.items.length - 1) / 2) * 250;
+        const rot = (i - (r.items.length - 1) / 2) * 7;
+        return (
+          <AbsoluteFill key={i} style={{ alignItems: "center", top: 640 }}>
+            <Img
+              src={staticFile(it.src)}
+              style={{
+                width: 520,
+                borderRadius: 26,
+                border: i === shown ? `8px solid ${ORANGE}` : "8px solid #fff",
+                boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
+                transform: `translate(${x * s}px, ${(1 - s) * 500}px) rotate(${rot * s}deg) scale(${i === shown ? 1.04 : 0.94})`,
+                zIndex: i,
+              }}
+            />
+          </AbsoluteFill>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // Progress bar
 // ---------------------------------------------------------------------------
 const Progress: React.FC<{ total: number }> = ({ total }) => {
@@ -405,7 +568,23 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
             <Audio src={staticFile("jirafik/pop.wav")} volume={0.35} />
           </Sequence>
         ))}
+        {(p.inserts ?? []).map((ins, i) => (
+          <Sequence key={`in${i}`} from={f(ins.start)} durationInFrames={f(ins.duration)}>
+            <PhotoInsert ins={ins} index={i} />
+            <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.12} />
+          </Sequence>
+        ))}
         <Captions words={p.words} from={p.captionsFrom} />
+        {p.reveal && (
+          <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
+            <Reveal r={p.reveal} />
+            {p.reveal.items.map((_, i) => (
+              <Sequence key={`dg${i}`} from={Math.round(i * ((p.reveal!.duration - 1.2) / p.reveal!.items.length) * fps)} durationInFrames={f(0.5)}>
+                <Audio src={staticFile("jirafik/ding.wav")} volume={0.18 + 0.06 * i} />
+              </Sequence>
+            ))}
+          </Sequence>
+        )}
         <Sequence durationInFrames={f(p.hook.until)}>
           <Hook hook={p.hook} />
         </Sequence>
