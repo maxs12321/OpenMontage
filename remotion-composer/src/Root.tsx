@@ -16,6 +16,11 @@ import { ProductReveal, ProductRevealProps } from "./components/ProductReveal";
 import { CaptionOverlay, WordCaption } from "./components/CaptionOverlay";
 import { CollageBurst, CollageBurstProps } from "./CollageBurst";
 import { LyricOverlay, LyricOverlayProps } from "./LyricOverlay";
+import {
+  JirafikVlog,
+  JirafikVlogProps,
+  calculateJirafikVlogMetadata,
+} from "./JirafikVlog";
 
 // ---------------------------------------------------------------------------
 // Theme System — prevents every video from looking like dark fintech
@@ -329,6 +334,27 @@ export const Root: React.FC = () => {
           fadeOutSeconds: 1.5,
           overlay: true,
         } as EndTagProps}
+      />
+      <Composition
+        id="JirafikVlog"
+        component={JirafikVlog}
+        durationInFrames={30 * 60}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calculateJirafikVlogMetadata}
+        defaultProps={{
+          videoSrc: "",
+          videoDuration: 10,
+          cuts: [],
+          whooshAt: [],
+          emphasis: [],
+          words: [],
+          stickers: [],
+          hook: { tag: "", line1: "", line2: "", until: 1.5 },
+          captionsFrom: 0,
+          endCard: { seconds: 2.6, question: "", handles: [] },
+        } as JirafikVlogProps}
       />
     </>
   );
