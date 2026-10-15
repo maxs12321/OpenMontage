@@ -1,6 +1,6 @@
 {
  "videoSrc": "jirafik/v2-cut.mp4",
- "videoDuration": 60.13,
+ "videoDuration": 56.66,
  "cuts": [
   2.44,
   11.57,
@@ -18,6 +18,10 @@
   {
    "start": 5.8,
    "end": 6.44
+  },
+  {
+   "start": 41.13,
+   "end": 41.45
   }
  ],
  "words": [
@@ -906,37 +910,20 @@
  "stickers": [],
  "inserts": [
   {
-   "src": "jirafik/v2-ins-balance.jpg",
-   "start": 14.6,
-   "duration": 1.7,
-   "label": "Доходы",
-   "width": 860,
-   "aspect": 1.7892644135188867
+   "src": "jirafik/v2-ins-analytics.jpg",
+   "start": 14.55,
+   "duration": 2.3,
+   "label": "Аналитика",
+   "width": 900,
+   "aspect": 1.2987012987012987
   }
  ],
- "reveal": {
-  "start": 54.55,
-  "duration": 5.58,
-  "title": "ВЫПЛАТЫ ЗА ЦЕЛЕВЫЕ ДЕЙСТВИЯ",
-  "caption": "личный кабинет партнёрки · реальный скрин",
-  "items": [
-   {
-    "src": "jirafik/v2-rev-payouts.jpg",
-    "amount": 184800
-   }
-  ],
-  "fadeOut": false,
-  "typeTitleSeconds": 0.9,
-  "counterDelay": 1.0,
-  "climbSeconds": 0.75,
-  "cardWidth": 860
- },
  "hook": {
   "tag": "",
   "line1": "День",
   "line2": "арбитражника",
   "until": 2.3,
-  "teaser": "в конце — скрин выплаты"
+  "teaser": "когда всё пошло не по плану"
  },
  "hookStyle": "lower",
  "captionStyle": "word",
@@ -963,7 +950,7 @@
    "volume": 0.4
   },
   {
-   "at": 14.6,
+   "at": 14.55,
    "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.35
   },
@@ -1006,26 +993,6 @@
    "at": 50.67,
    "src": "jirafik/sfx3-mouse-click.wav",
    "volume": 0.4
-  },
-  {
-   "at": 54.55,
-   "src": "jirafik/sfx2-zoom.wav",
-   "volume": 0.3
-  },
-  {
-   "at": 54.58,
-   "src": "jirafik/sfx3-mac-typing.wav",
-   "volume": 0.35
-  },
-  {
-   "at": 55.55,
-   "src": "jirafik/sfx2-gauge.wav",
-   "volume": 0.4
-  },
-  {
-   "at": 56.28,
-   "src": "jirafik/sfx3-ding.wav",
-   "volume": 0.5
   }
  ],
  "endCard": {
