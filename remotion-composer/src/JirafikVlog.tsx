@@ -54,6 +54,7 @@ export type VlogReveal = {
   typeTitleSeconds?: number; // type the title out letter by letter (pairs with a typing SFX)
   counterDelay?: number; // seconds before the counter starts climbing
   climbSeconds?: number; // how long the counter climbs (pairs with a gauge SFX)
+  cardWidth?: number; // reveal card width, px (wider for landscape screenshots)
 };
 
 export type JirafikVlogProps = {
@@ -662,7 +663,7 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
             <Img
               src={staticFile(it.src)}
               style={{
-                width: r.items.length === 1 ? 640 : 520,
+                width: r.cardWidth ?? (r.items.length === 1 ? 640 : 520),
                 borderRadius: 26,
                 border: i === shown ? `8px solid ${ORANGE}` : "8px solid #fff",
                 boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
