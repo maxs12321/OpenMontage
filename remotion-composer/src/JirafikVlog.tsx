@@ -80,6 +80,12 @@ export type JirafikVlogProps = {
   hookStyle?: "card" | "lower";
   sfx?: { at: number; src: string; volume?: number }[];
   inserts?: VlogInsert[];
+  // list videos: "№1 Альфа-Банк · 14 000 ₽" chip at the top while that item is discussed
+  chapters?: { start: number; end: number; kicker: string; title: string; value?: string }[];
+  // one-off sum card, e.g. 14 000 + 9 000 + 20 000 = 43 000 ₽
+  calc?: { start: number; end: number; parts: string[]; total: string };
+  // call to action pill at the end
+  cta?: { start: number; end: number; label: string; handle: string };
   reveal?: VlogReveal;
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
@@ -679,6 +685,115 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
 };
 
 // ---------------------------------------------------------------------------
+// Chapter chip (list videos)
+// ---------------------------------------------------------------------------
+const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number] }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const inn = spring({ frame, fps, config: { damping: 16, stiffness: 160 } });
+  const total = (c.end - c.start) * fps;
+  const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 150,
+          opacity: Math.min(inn, out),
+          transform: `translateX(${(1 - inn) * -80}px)`,
+          display: "flex",
+          alignItems: "stretch",
+          borderRadius: 18,
+          overflow: "hidden",
+          boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+        }}
+      >
+        <div style={{ background: ORANGE, color: NAVY, fontFamily: TITLE, fontWeight: 700, fontSize: 64, padding: "6px 22px", display: "flex", alignItems: "center" }}>
+          {c.kicker}
+        </div>
+        <div style={{ background: "rgba(20,24,58,0.92)", padding: "10px 24px 12px" }}>
+          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: "#fff", lineHeight: 1.1 }}>{c.title}</div>
+          {c.value && <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 36, color: ORANGE, lineHeight: 1.2 }}>{c.value}</div>}
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Sum card: parts appear one by one, then the total
+// ---------------------------------------------------------------------------
+const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]> }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const total = (c.end - c.start) * fps;
+  const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const card = spring({ frame, fps, config: { damping: 16, stiffness: 160 } });
+  const step = 7;
+  const totalIn = spring({ frame: frame - step * c.parts.length - 4, fps, config: { damping: 10, stiffness: 200 } });
+  return (
+    <AbsoluteFill style={{ alignItems: "center", top: 300, opacity: out }}>
+      <div
+        style={{
+          transform: `scale(${0.85 + 0.15 * card})`,
+          opacity: card,
+          background: "rgba(20,24,58,0.94)",
+          border: `5px solid ${ORANGE}`,
+          borderRadius: 28,
+          padding: "28px 40px 32px",
+          textAlign: "center",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+        }}
+      >
+        <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", fontFamily: BODY, fontWeight: 800, fontSize: 50, color: "#fff" }}>
+          {c.parts.map((p, i) => {
+            const v = spring({ frame: frame - i * step, fps, config: { damping: 14, stiffness: 200 } });
+            return (
+              <React.Fragment key={i}>
+                {i > 0 && <span style={{ color: ORANGE, opacity: v }}>+</span>}
+                <span style={{ opacity: v, transform: `translateY(${(1 - v) * 20}px)`, display: "inline-block" }}>{p}</span>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 130, color: GOLD, lineHeight: 1.1, marginTop: 8, opacity: totalIn, transform: `scale(${0.6 + 0.4 * totalIn})` }}>
+          = {c.total}
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// CTA pill
+// ---------------------------------------------------------------------------
+const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]> }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const inn = spring({ frame, fps, config: { damping: 12, stiffness: 170 } });
+  return (
+    <AbsoluteFill style={{ alignItems: "center", top: 330 }}>
+      <div
+        style={{
+          transform: `scale(${0.7 + 0.3 * inn})`,
+          opacity: inn,
+          background: "rgba(20,24,58,0.94)",
+          border: `5px solid ${ORANGE}`,
+          borderRadius: 26,
+          padding: "18px 40px 22px",
+          textAlign: "center",
+          boxShadow: "0 16px 40px rgba(0,0,0,0.4)",
+        }}
+      >
+        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 40, color: LIGHT }}>{c.label}</div>
+        <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 92, color: ORANGE, lineHeight: 1.1 }}>{c.handle}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // Progress bar
 // ---------------------------------------------------------------------------
 const Progress: React.FC<{ total: number }> = ({ total }) => {
@@ -760,6 +875,21 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
             {p.sfx === undefined && <Audio src={staticFile("jirafik/whoosh.wav")} volume={0.12} />}
           </Sequence>
         ))}
+        {(p.chapters ?? []).map((c, i) => (
+          <Sequence key={`ch${i}`} from={f(c.start)} durationInFrames={f(c.end - c.start)}>
+            <Chapter c={c} />
+          </Sequence>
+        ))}
+        {p.calc && (
+          <Sequence from={f(p.calc.start)} durationInFrames={f(p.calc.end - p.calc.start)}>
+            <Calc c={p.calc} />
+          </Sequence>
+        )}
+        {p.cta && (
+          <Sequence from={f(p.cta.start)} durationInFrames={f(p.cta.end - p.cta.start)}>
+            <Cta c={p.cta} />
+          </Sequence>
+        )}
         <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />
         {p.reveal && (
           <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
