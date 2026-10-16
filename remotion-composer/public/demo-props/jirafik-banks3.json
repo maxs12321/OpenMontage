@@ -990,7 +990,8 @@
   "handles": []
  },
  "motion": {
-  "push": 0.04,
+  "push": 0.02,
+  "jumpZoom": 0.12,
   "alternate": false,
   "punch": 0,
   "blur": 0,
@@ -1005,29 +1006,55 @@
    "start": 9.31,
    "end": 10.74,
    "lines": [
-    "АЛЬФА"
-   ]
+    "АЛЬ",
+    "ФА"
+   ],
+   "size": 470,
+   "top": 238,
+   "align": "left"
   },
   {
    "start": 21.04,
    "end": 22.47,
    "lines": [
     "ПСБ"
-   ]
+   ],
+   "size": 470,
+   "top": 545,
+   "align": "left"
   },
   {
    "start": 30.15,
    "end": 31.5,
    "lines": [
-    "Т-БАНК"
-   ]
+    "Т-",
+    "БАНК"
+   ],
+   "size": 375,
+   "top": 319,
+   "align": "left"
   },
   {
    "start": 41.87,
    "end": 43.14,
    "lines": [
-    "СОВРАЛ"
-   ]
+    "СОВ",
+    "РАЛ"
+   ],
+   "size": 470,
+   "top": 249,
+   "align": "left"
+  },
+  {
+   "start": 52.88,
+   "end": 54.15,
+   "lines": [
+    "БЕСП",
+    "ЛАТНО"
+   ],
+   "size": 300,
+   "top": 422,
+   "align": "left"
   }
  ]
 }

@@ -88,7 +88,15 @@ export type JirafikVlogProps = {
   cta?: { start: number; end: number; label: string; handle: string };
   // giant words placed BEHIND the speaker (needs personSrc: transparent webm cut-out of the same video)
   personSrc?: string;
-  bigWords?: { start: number; end: number; lines: string[]; color?: string }[];
+  bigWords?: {
+    start: number;
+    end: number;
+    lines: string[]; // stacked, e.g. ["НИ","КО","ГДА"]; lines pop in one after another
+    color?: string;
+    top?: number; // px from frame top (un-zoomed); place so the head overlaps the text
+    align?: "left" | "center";
+    size?: number;
+  }[];
   // plates on light footage: "light" = white cards, "dark" = navy cards
   plateTheme?: "light" | "dark";
   reveal?: VlogReveal;
@@ -104,6 +112,7 @@ export type JirafikVlogProps = {
     flash?: boolean; // white flash on cold-open cuts
     emphasisZoom?: number; // zoom on emphasis words
     vignette?: boolean; // dark edge vignette (off for bright footage)
+    jumpZoom?: number; // static punch-in on every other shot (reference "jump zoom"), e.g. 0.12
   };
 };
 
@@ -131,13 +140,24 @@ const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const total = (w.end - w.start) * fps;
-  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const out = interpolate(frame, [total - 5, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const longest = Math.max(...w.lines.map((l) => l.length));
-  const size = Math.min(430, Math.floor(1700 / Math.max(longest, 2)));
+  const size = w.size ?? Math.min(470, Math.floor(1500 / Math.max(longest, 2)));
+  const left = (w.align ?? "left") === "left";
+  const step = Math.max(2, Math.min(5, Math.floor((total * 0.35) / Math.max(w.lines.length, 1))));
   return (
-    <AbsoluteFill style={{ alignItems: "center", justifyContent: "flex-start", paddingTop: 560, opacity: out }}>
+    <AbsoluteFill
+      style={{
+        alignItems: left ? "flex-start" : "center",
+        justifyContent: "flex-start",
+        paddingTop: w.top ?? 520,
+        paddingLeft: left ? 50 : 0,
+        opacity: out,
+      }}
+    >
       {w.lines.map((l, i) => {
-        const s = spring({ frame: frame - i * 3, fps, config: { damping: 13, stiffness: 190 } });
+        const shown = frame >= i * step;
+        const s = spring({ frame: frame - i * step, fps, config: { damping: 14, stiffness: 260 } });
         return (
           <div
             key={i}
@@ -145,12 +165,13 @@ const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }
               fontFamily: TITLE,
               fontWeight: 700,
               fontSize: size,
-              lineHeight: 0.92,
+              lineHeight: 0.86,
               color: w.color ?? ORANGE,
               textTransform: "uppercase",
               letterSpacing: "-0.01em",
-              opacity: Math.min(1, s * 1.4),
-              transform: `translateY(${(1 - s) * 80}px) scale(${0.9 + 0.1 * s})`,
+              opacity: shown ? 1 : 0,
+              transform: `scale(${1.25 - 0.25 * s})`,
+              transformOrigin: left ? "left center" : "center",
               whiteSpace: "nowrap",
             }}
           >
@@ -177,7 +198,8 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const prog = Math.min(local / shotLen, 1);
   const eased = prog * prog * (3 - 2 * prog);
   const pullOut = m.alternate && i % 2 === 1;
-  const push = pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased;
+  const jump = m.jumpZoom && i % 2 === 1 ? m.jumpZoom : 0;
+  const push = (pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased) + jump;
   const punchT = Math.min(local / 0.22, 1);
   const punch = i === 0 ? 0 : m.punch * Math.pow(1 - punchT, 2);
   const blur = i === 0 ? 0 : m.blur * Math.pow(1 - punchT, 2);
