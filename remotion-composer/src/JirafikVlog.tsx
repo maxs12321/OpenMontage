@@ -86,6 +86,11 @@ export type JirafikVlogProps = {
   calc?: { start: number; end: number; parts: string[]; total: string };
   // call to action pill at the end
   cta?: { start: number; end: number; label: string; handle: string };
+  // giant words placed BEHIND the speaker (needs personSrc: transparent webm cut-out of the same video)
+  personSrc?: string;
+  bigWords?: { start: number; end: number; lines: string[]; color?: string }[];
+  // plates on light footage: "light" = white cards, "dark" = navy cards
+  plateTheme?: "light" | "dark";
   reveal?: VlogReveal;
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
@@ -98,6 +103,7 @@ export type JirafikVlogProps = {
     blur?: number; // motion blur on each cut, px
     flash?: boolean; // white flash on cold-open cuts
     emphasisZoom?: number; // zoom on emphasis words
+    vignette?: boolean; // dark edge vignette (off for bright footage)
   };
 };
 
@@ -121,6 +127,41 @@ const easeOut = (x: number) => 1 - Math.pow(1 - Math.min(Math.max(x, 0), 1), 3);
 // ---------------------------------------------------------------------------
 // Video layer: slow push per shot, punch-in + blur on every cut, emphasis zoom
 // ---------------------------------------------------------------------------
+const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }> = ({ w }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const total = (w.end - w.start) * fps;
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const longest = Math.max(...w.lines.map((l) => l.length));
+  const size = Math.min(430, Math.floor(1700 / Math.max(longest, 2)));
+  return (
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "flex-start", paddingTop: 560, opacity: out }}>
+      {w.lines.map((l, i) => {
+        const s = spring({ frame: frame - i * 3, fps, config: { damping: 13, stiffness: 190 } });
+        return (
+          <div
+            key={i}
+            style={{
+              fontFamily: TITLE,
+              fontWeight: 700,
+              fontSize: size,
+              lineHeight: 0.92,
+              color: w.color ?? ORANGE,
+              textTransform: "uppercase",
+              letterSpacing: "-0.01em",
+              opacity: Math.min(1, s * 1.4),
+              transform: `translateY(${(1 - s) * 80}px) scale(${0.9 + 0.1 * s})`,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {l}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
 const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -131,7 +172,7 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const shotStart = bounds[i];
   const shotLen = Math.max(bounds[i + 1] - shotStart, 0.1);
   const local = t - shotStart;
-  const m = { ...DEFAULT_MOTION, ...p.motion };
+  const m = { ...DEFAULT_MOTION, vignette: true, ...p.motion };
   // Ease the push so a shot starts and settles gently instead of drifting linearly.
   const prog = Math.min(local / shotLen, 1);
   const eased = prog * prog * (3 - 2 * prog);
@@ -161,14 +202,35 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
           src={resolveAsset(p.videoSrc)}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
+        {p.personSrc &&
+          (p.bigWords ?? []).map((w, i) => {
+            const from = Math.round(w.start * fps);
+            const dur = Math.round((w.end - w.start) * fps);
+            return (
+              <Sequence key={`bw${i}`} from={from} durationInFrames={dur}>
+                <BigWord w={w} />
+                <AbsoluteFill>
+                  <OffthreadVideo
+                    src={resolveAsset(p.personSrc!)}
+                    startFrom={from}
+                    transparent
+                    muted
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </AbsoluteFill>
+              </Sequence>
+            );
+          })}
       </AbsoluteFill>
       {/* soft vignette keeps text readable on bright shots */}
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(10,12,30,0.45) 100%)",
-        }}
-      />
+      {m.vignette && (
+        <AbsoluteFill
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(10,12,30,0.45) 100%)",
+          }}
+        />
+      )}
       {flash > 0 && <AbsoluteFill style={{ backgroundColor: `rgba(255,255,255,${flash})` }} />}
     </AbsoluteFill>
   );
@@ -687,7 +749,7 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
 // ---------------------------------------------------------------------------
 // Chapter chip (list videos)
 // ---------------------------------------------------------------------------
-const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number] }> = ({ c }) => {
+const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number]; light?: boolean }> = ({ c, light }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const inn = spring({ frame, fps, config: { damping: 16, stiffness: 160 } });
@@ -706,14 +768,14 @@ const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number] }
           alignItems: "stretch",
           borderRadius: 18,
           overflow: "hidden",
-          boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+          boxShadow: light ? "0 10px 26px rgba(20,24,58,0.18)" : "0 12px 30px rgba(0,0,0,0.35)",
         }}
       >
-        <div style={{ background: ORANGE, color: NAVY, fontFamily: TITLE, fontWeight: 700, fontSize: 64, padding: "6px 22px", display: "flex", alignItems: "center" }}>
+        <div style={{ background: ORANGE, color: light ? "#fff" : NAVY, fontFamily: TITLE, fontWeight: 700, fontSize: 64, padding: "6px 22px", display: "flex", alignItems: "center" }}>
           {c.kicker}
         </div>
-        <div style={{ background: "rgba(20,24,58,0.92)", padding: "10px 24px 12px" }}>
-          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: "#fff", lineHeight: 1.1 }}>{c.title}</div>
+        <div style={{ background: light ? "rgba(255,255,255,0.94)" : "rgba(20,24,58,0.92)", padding: "10px 24px 12px" }}>
+          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: light ? NAVY : "#fff", lineHeight: 1.1 }}>{c.title}</div>
           {c.value && <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 36, color: ORANGE, lineHeight: 1.2 }}>{c.value}</div>}
         </div>
       </div>
@@ -724,7 +786,7 @@ const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number] }
 // ---------------------------------------------------------------------------
 // Sum card: parts appear one by one, then the total
 // ---------------------------------------------------------------------------
-const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]> }> = ({ c }) => {
+const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]>; light?: boolean }> = ({ c, light }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const total = (c.end - c.start) * fps;
@@ -738,15 +800,15 @@ const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]> }> = ({ c }) => 
         style={{
           transform: `scale(${0.85 + 0.15 * card})`,
           opacity: card,
-          background: "rgba(20,24,58,0.94)",
-          border: `5px solid ${ORANGE}`,
+          background: light ? "rgba(255,255,255,0.95)" : "rgba(20,24,58,0.94)",
+          border: light ? "none" : `5px solid ${ORANGE}`,
           borderRadius: 28,
           padding: "28px 40px 32px",
           textAlign: "center",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+          boxShadow: light ? "0 14px 34px rgba(20,24,58,0.2)" : "0 20px 50px rgba(0,0,0,0.45)",
         }}
       >
-        <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", fontFamily: BODY, fontWeight: 800, fontSize: 50, color: "#fff" }}>
+        <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", fontFamily: BODY, fontWeight: 800, fontSize: 50, color: light ? NAVY : "#fff" }}>
           {c.parts.map((p, i) => {
             const v = spring({ frame: frame - i * step, fps, config: { damping: 14, stiffness: 200 } });
             return (
@@ -757,7 +819,7 @@ const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]> }> = ({ c }) => 
             );
           })}
         </div>
-        <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 130, color: GOLD, lineHeight: 1.1, marginTop: 8, opacity: totalIn, transform: `scale(${0.6 + 0.4 * totalIn})` }}>
+        <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 130, color: light ? ORANGE : GOLD, lineHeight: 1.1, marginTop: 8, opacity: totalIn, transform: `scale(${0.6 + 0.4 * totalIn})` }}>
           = {c.total}
         </div>
       </div>
@@ -768,7 +830,7 @@ const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]> }> = ({ c }) => 
 // ---------------------------------------------------------------------------
 // CTA pill
 // ---------------------------------------------------------------------------
-const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]> }> = ({ c }) => {
+const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]>; light?: boolean }> = ({ c, light }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const inn = spring({ frame, fps, config: { damping: 12, stiffness: 170 } });
@@ -778,15 +840,15 @@ const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]> }> = ({ c }) => {
         style={{
           transform: `scale(${0.7 + 0.3 * inn})`,
           opacity: inn,
-          background: "rgba(20,24,58,0.94)",
-          border: `5px solid ${ORANGE}`,
+          background: light ? "rgba(255,255,255,0.95)" : "rgba(20,24,58,0.94)",
+          border: light ? "none" : `5px solid ${ORANGE}`,
           borderRadius: 26,
           padding: "18px 40px 22px",
           textAlign: "center",
-          boxShadow: "0 16px 40px rgba(0,0,0,0.4)",
+          boxShadow: light ? "0 12px 30px rgba(20,24,58,0.2)" : "0 16px 40px rgba(0,0,0,0.4)",
         }}
       >
-        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 40, color: LIGHT }}>{c.label}</div>
+        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 40, color: light ? NAVY : LIGHT }}>{c.label}</div>
         <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 92, color: ORANGE, lineHeight: 1.1 }}>{c.handle}</div>
       </div>
     </AbsoluteFill>
@@ -877,17 +939,17 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
         ))}
         {(p.chapters ?? []).map((c, i) => (
           <Sequence key={`ch${i}`} from={f(c.start)} durationInFrames={f(c.end - c.start)}>
-            <Chapter c={c} />
+            <Chapter c={c} light={p.plateTheme === "light"} />
           </Sequence>
         ))}
         {p.calc && (
           <Sequence from={f(p.calc.start)} durationInFrames={f(p.calc.end - p.calc.start)}>
-            <Calc c={p.calc} />
+            <Calc c={p.calc} light={p.plateTheme === "light"} />
           </Sequence>
         )}
         {p.cta && (
           <Sequence from={f(p.cta.start)} durationInFrames={f(p.cta.end - p.cta.start)}>
-            <Cta c={p.cta} />
+            <Cta c={p.cta} light={p.plateTheme === "light"} />
           </Sequence>
         )}
         <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />

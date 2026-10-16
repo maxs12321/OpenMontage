@@ -862,7 +862,7 @@
   }
  ],
  "calc": {
-  "start": 42.44,
+  "start": 43.459999999999994,
   "end": 47.49,
   "parts": [
    "14 000",
@@ -954,12 +954,12 @@
    "volume": 0.4
   },
   {
-   "at": 42.44,
+   "at": 43.459999999999994,
    "src": "jirafik/sfx2-appear.wav",
    "volume": 0.35
   },
   {
-   "at": 43.273,
+   "at": 44.293,
    "src": "jirafik/sfx3-ding.wav",
    "volume": 0.5
   },
@@ -995,6 +995,39 @@
   "punch": 0,
   "blur": 0,
   "flash": false,
-  "emphasisZoom": 0.05
- }
+  "emphasisZoom": 0.05,
+  "vignette": false
+ },
+ "plateTheme": "light",
+ "personSrc": "jirafik/v3-person.webm",
+ "bigWords": [
+  {
+   "start": 9.31,
+   "end": 10.74,
+   "lines": [
+    "АЛЬФА"
+   ]
+  },
+  {
+   "start": 21.04,
+   "end": 22.47,
+   "lines": [
+    "ПСБ"
+   ]
+  },
+  {
+   "start": 30.15,
+   "end": 31.5,
+   "lines": [
+    "Т-БАНК"
+   ]
+  },
+  {
+   "start": 41.87,
+   "end": 43.14,
+   "lines": [
+    "СОВРАЛ"
+   ]
+  }
+ ]
 }
