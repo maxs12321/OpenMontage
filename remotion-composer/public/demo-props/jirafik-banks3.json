@@ -894,24 +894,19 @@
    "volume": 0.4
   },
   {
-   "at": 0.17,
-   "src": "jirafik/sfx2-appear.wav",
-   "volume": 0.35
-  },
-  {
    "at": 8.36,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.35
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.6
   },
   {
-   "at": 9.34,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "at": 9.31,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 11.86,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
    "at": 19.69,
@@ -919,44 +914,44 @@
    "volume": 0.35
   },
   {
-   "at": 21.07,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "at": 21.04,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 22.39,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
    "at": 24.99,
-   "src": "jirafik/sfx3-mouse-click.wav",
+   "src": "jirafik/sfx2-charge.wav",
    "volume": 0.4
   },
   {
    "at": 28.64,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.35
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.6
   },
   {
-   "at": 30.18,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "at": 30.15,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 33.78,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx3-camera-click.wav",
+   "volume": 0.45
   },
   {
    "at": 35.46,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
-   "at": 43.459999999999994,
-   "src": "jirafik/sfx2-appear.wav",
-   "volume": 0.35
+   "at": 43.46,
+   "src": "jirafik/sfx3-mac-typing.wav",
+   "volume": 0.3
   },
   {
    "at": 44.293,
@@ -965,23 +960,18 @@
   },
   {
    "at": 45.98,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
    "at": 52.91,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
-  },
-  {
-   "at": 56.64,
    "src": "jirafik/sfx2-appear.wav",
    "volume": 0.35
   },
   {
-   "at": 57.82,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "at": 56.64,
+   "src": "jirafik/sfx2-paper-turn.wav",
+   "volume": 0.3
   }
  ],
  "endCard": {
@@ -1000,6 +990,7 @@
   "vignette": false
  },
  "plateTheme": "light",
+ "showProgress": false,
  "personSrc": "jirafik/v3-person.webm",
  "bigWords": [
   {
@@ -1032,28 +1023,6 @@
    ],
    "size": 375,
    "top": 319,
-   "align": "left"
-  },
-  {
-   "start": 41.87,
-   "end": 43.14,
-   "lines": [
-    "СОВ",
-    "РАЛ"
-   ],
-   "size": 470,
-   "top": 249,
-   "align": "left"
-  },
-  {
-   "start": 52.88,
-   "end": 54.15,
-   "lines": [
-    "БЕСП",
-    "ЛАТНО"
-   ],
-   "size": 300,
-   "top": 422,
    "align": "left"
   }
  ]

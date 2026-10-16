@@ -99,6 +99,7 @@ export type JirafikVlogProps = {
   }[];
   // plates on light footage: "light" = white cards, "dark" = navy cards
   plateTheme?: "light" | "dark";
+  showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
@@ -993,7 +994,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
         <Sequence from={f(p.hook.flash?.until ?? 0)} durationInFrames={f(p.hook.until - (p.hook.flash?.until ?? 0))}>
           {p.hookStyle === "lower" ? <HookLower hook={p.hook} /> : <Hook hook={p.hook} />}
         </Sequence>
-        <Progress total={p.videoDuration} />
+        {p.showProgress !== false && <Progress total={p.videoDuration} />}
       </Sequence>
       {(p.sfx ?? []).map((x, i) => (
         <Sequence key={`sfx${i}`} from={Math.max(0, f(x.at))} durationInFrames={f(1.2)}>
