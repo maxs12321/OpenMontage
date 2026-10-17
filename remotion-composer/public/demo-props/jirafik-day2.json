@@ -935,29 +935,29 @@
    "volume": 0.4
   },
   {
-   "at": 0.17,
-   "src": "jirafik/sfx2-appear.wav",
+   "at": 4.15,
+   "src": "jirafik/sfx2-zoom.wav",
    "volume": 0.35
   },
   {
    "at": 5.78,
    "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "volume": 0.45
   },
   {
    "at": 13.52,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx3-mac-typing.wav",
+   "volume": 0.3
   },
   {
    "at": 14.55,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.35
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.5
   },
   {
    "at": 19.81,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
    "at": 22.53,
@@ -966,8 +966,8 @@
   },
   {
    "at": 26.4,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-paper-turn.wav",
+   "volume": 0.35
   },
   {
    "at": 33.77,
@@ -976,23 +976,23 @@
   },
   {
    "at": 36.84,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx3-camera-click.wav",
+   "volume": 0.45
   },
   {
    "at": 41.11,
-   "src": "jirafik/sfx3-mouse-click.wav",
+   "src": "jirafik/sfx2-charge.wav",
    "volume": 0.4
   },
   {
    "at": 44.19,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.3
   },
   {
    "at": 50.67,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx3-ding.wav",
+   "volume": 0.45
   }
  ],
  "endCard": {
@@ -1001,11 +1001,49 @@
   "handles": []
  },
  "motion": {
-  "push": 0.04,
+  "push": 0.015,
+  "jumpZoom": 0.12,
+  "jumpRanges": [
+   [
+    11.57,
+    17.85
+   ],
+   [
+    39.25,
+    44.73
+   ],
+   [
+    49.61,
+    56.66
+   ]
+  ],
   "alternate": false,
   "punch": 0,
   "blur": 0,
   "flash": false,
-  "emphasisZoom": 0.05
- }
+  "emphasisZoom": 0.05,
+  "vignette": false
+ },
+ "plateTheme": "light",
+ "showProgress": false,
+ "personSrc": "jirafik/v2-person.webm",
+ "bigWords": [
+  {
+   "start": 4.15,
+   "end": 5.75,
+   "lines": [
+    "5",
+    "ИСТОЧ",
+    "НИКОВ"
+   ],
+   "size": 234,
+   "top": 62,
+   "align": "left",
+   "font": {
+    "family": "'Russo One', sans-serif",
+    "weight": 400,
+    "lineHeight": 0.95
+   }
+  }
+ ]
 }
