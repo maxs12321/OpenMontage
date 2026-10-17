@@ -27,7 +27,10 @@ const HEAD = "Lora, serif";
 const BODY = "Inter, 'Noto Color Emoji', sans-serif";
 const TITLE = "Oswald, Inter, sans-serif";
 
-export type VlogWord = { text: string; start: number; end: number; key?: boolean };
+// anim: how a key word enters, matched 1:1 to its sound (Ilya's SFX tutorial):
+// scale→whoosh-short, rotate→paper-turn, type→typing, zoom→zoom(Fuwa), appear→appear, flicker→charge, count→gauge
+export type WordAnim = "scale" | "rotate" | "type" | "zoom" | "appear" | "flicker" | "count";
+export type VlogWord = { text: string; start: number; end: number; key?: boolean; anim?: WordAnim };
 export type VlogSticker = {
   text: string;
   start: number;
@@ -174,7 +177,7 @@ const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }
               textTransform: "uppercase",
               letterSpacing: "-0.01em",
               opacity: shown ? 1 : 0,
-              transform: `scale(${1.25 - 0.25 * s})`,
+              transform: `translateX(${(1 - s) * 300}px) scale(${1 + 1.4 * (1 - s)})`,
               transformOrigin: left ? "left center" : "center",
               whiteSpace: "nowrap",
             }}
@@ -425,6 +428,45 @@ const buildPages = (words: VlogWord[], maxWords = 3): Page[] => {
 
 const BOLD_SHADOW = "0 4px 14px rgba(0,0,0,0.75), 0 0 3px rgba(0,0,0,0.9)";
 
+// Entry animation for a key word; each one pairs with exactly one sound.
+const wordAnim = (anim: WordAnim | undefined, wf: number, fps: number, text: string) => {
+  const sp = (d: number, k: number) => spring({ frame: wf, fps, config: { damping: d, stiffness: k } });
+  const r = { transform: "none", opacity: 1, filter: "none", letterSpacing: "normal", text };
+  if (anim === "scale") {
+    const v = sp(14, 260);
+    return { ...r, transform: `scale(${0.3 + 0.7 * v})`, opacity: Math.min(1, v * 1.6) };
+  }
+  if (anim === "rotate") {
+    const v = sp(13, 150);
+    return { ...r, transform: `rotate(${-28 * (1 - v)}deg) scale(${0.7 + 0.3 * v})`, opacity: Math.min(1, v * 1.5) };
+  }
+  if (anim === "zoom") {
+    const v = sp(18, 170);
+    return { ...r, transform: `translateX(${(1 - v) * 380}px) scale(${1 + 3 * (1 - v)})`, opacity: Math.min(1, 0.4 + v) };
+  }
+  if (anim === "appear") {
+    const v = interpolate(wf, [0, 9], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    return { ...r, opacity: v, filter: `blur(${(1 - v) * 10}px)`, letterSpacing: `${(1 - v) * 0.35}em` };
+  }
+  if (anim === "flicker") {
+    const on = wf >= 9 || [0, 1, 4, 5, 7].includes(wf);
+    return { ...r, opacity: wf < 0 ? 0 : on ? 1 : 0.15 };
+  }
+  if (anim === "type") {
+    const n = Math.max(1, Math.ceil(interpolate(wf, [0, 12], [0, text.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })));
+    return { ...r, text: text.slice(0, n) };
+  }
+  if (anim === "count") {
+    const m = text.match(/\d[\d\s]*/);
+    if (!m) return r;
+    const target = parseInt(m[0].replace(/\s/g, ""), 10);
+    const v = interpolate(wf, [0, 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const cur = Math.round(target * (1 - Math.pow(1 - v, 3))).toLocaleString("ru-RU");
+    return { ...r, text: text.replace(m[0].trimEnd(), cur) };
+  }
+  return r;
+};
+
 const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" | "word" }> = ({
   words,
   from,
@@ -450,12 +492,16 @@ const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | 
     const wf = Math.round((t - w.start) * fps);
     const bounce = spring({ frame: wf, fps, config: { damping: 11, stiffness: 240 } });
     const scale = 0.8 + 0.2 * bounce;
+    const a = wordAnim(w.anim, wf, fps, text);
     return (
       <AbsoluteFill style={{ alignItems: "center", top: 1190 }}>
         {w.key ? (
           <span
             style={{
-              transform: `scale(${scale * 1.04})`,
+              transform: w.anim ? a.transform : `scale(${scale * 1.04})`,
+              opacity: a.opacity,
+              filter: a.filter,
+              letterSpacing: a.letterSpacing,
               background: ORANGE,
               color: NAVY,
               fontFamily: BODY,
@@ -466,7 +512,7 @@ const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | 
               borderRadius: 6,
             }}
           >
-            {text}
+            {w.anim ? a.text : text}
           </span>
         ) : (
           <span
@@ -645,7 +691,7 @@ const Sticker: React.FC<{ s: VlogSticker; index: number }> = ({ s, index }) => {
 const PhotoInsert: React.FC<{ ins: VlogInsert; index: number }> = ({ ins, index }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const inn = spring({ frame, fps, config: { damping: 15, stiffness: 150 } });
+  const inn = spring({ frame, fps, config: { damping: 18, stiffness: 190, overshootClamping: true } });
   const total = ins.duration * fps;
   const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const w = ins.width ?? 640;
@@ -656,8 +702,8 @@ const PhotoInsert: React.FC<{ ins: VlogInsert; index: number }> = ({ ins, index 
     <AbsoluteFill style={{ alignItems: "center", top: 250 }}>
       <div
         style={{
-          transform: `translateY(${(1 - inn) * 120 + (1 - out) * -60}px) scale(${0.85 + 0.15 * inn}) rotate(${tilt * inn}deg)`,
-          opacity: Math.min(inn * 1.4, out),
+          transform: `translateY(${(1 - inn) * 1500 + (1 - out) * -60}px) rotate(${tilt * inn}deg)`,
+          opacity: out,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

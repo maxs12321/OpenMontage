@@ -119,7 +119,8 @@
    "text": "заблокированы,",
    "start": 5.8,
    "end": 6.44,
-   "key": true
+   "key": true,
+   "anim": "flicker"
   },
   {
    "text": "над",
@@ -255,7 +256,8 @@
    "text": "отчётность:",
    "start": 13.54,
    "end": 13.98,
-   "key": true
+   "key": true,
+   "anim": "type"
   },
   {
    "text": "проверяю",
@@ -332,7 +334,8 @@
    "text": "расходы,",
    "start": 19.83,
    "end": 20.35,
-   "key": true
+   "key": true,
+   "anim": "scale"
   },
   {
    "text": "задачи",
@@ -378,7 +381,8 @@
    "text": "РКО,",
    "start": 22.55,
    "end": 22.99,
-   "key": true
+   "key": true,
+   "anim": "appear"
   },
   {
    "text": "а",
@@ -444,7 +448,8 @@
    "text": "пуэр,",
    "start": 26.42,
    "end": 26.82,
-   "key": true
+   "key": true,
+   "anim": "rotate"
   },
   {
    "text": "поскольку",
@@ -560,7 +565,8 @@
    "text": "РКО,",
    "start": 33.79,
    "end": 34.58,
-   "key": true
+   "key": true,
+   "anim": "scale"
   },
   {
    "text": "написать",
@@ -606,7 +612,8 @@
    "text": "Claude",
    "start": 36.86,
    "end": 37.14,
-   "key": true
+   "key": true,
+   "anim": "type"
   },
   {
    "text": "насчет",
@@ -667,7 +674,8 @@
    "text": "ПСБ,",
    "start": 41.13,
    "end": 41.45,
-   "key": true
+   "key": true,
+   "anim": "zoom"
   },
   {
    "text": "поскольку",
@@ -723,7 +731,8 @@
    "text": "оплата.",
    "start": 44.21,
    "end": 44.71,
-   "key": true
+   "key": true,
+   "anim": "appear"
   },
   {
    "text": "Поэтому",
@@ -819,7 +828,8 @@
    "text": "продуктивный",
    "start": 50.69,
    "end": 51.25,
-   "key": true
+   "key": true,
+   "anim": "scale"
   },
   {
    "text": "день,",
@@ -941,13 +951,13 @@
   },
   {
    "at": 5.78,
-   "src": "jirafik/sfx3-mouse-click.wav",
+   "src": "jirafik/sfx2-charge.wav",
    "volume": 0.45
   },
   {
    "at": 13.52,
-   "src": "jirafik/sfx3-mac-typing.wav",
-   "volume": 0.3
+   "src": "jirafik/sfx2-typing-real.wav",
+   "volume": 0.35
   },
   {
    "at": 14.55,
@@ -956,12 +966,12 @@
   },
   {
    "at": 19.81,
-   "src": "jirafik/sfx2-gauge.wav",
-   "volume": 0.3
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
   },
   {
    "at": 22.53,
-   "src": "jirafik/sfx3-mouse-click.wav",
+   "src": "jirafik/sfx2-appear.wav",
    "volume": 0.4
   },
   {
@@ -971,28 +981,28 @@
   },
   {
    "at": 33.77,
-   "src": "jirafik/sfx3-mouse-click.wav",
+   "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.4
   },
   {
    "at": 36.84,
-   "src": "jirafik/sfx3-camera-click.wav",
-   "volume": 0.45
+   "src": "jirafik/sfx2-typing-real.wav",
+   "volume": 0.35
   },
   {
    "at": 41.11,
-   "src": "jirafik/sfx2-charge.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 44.19,
-   "src": "jirafik/sfx2-gauge.wav",
-   "volume": 0.3
+   "src": "jirafik/sfx2-appear.wav",
+   "volume": 0.4
   },
   {
    "at": 50.67,
-   "src": "jirafik/sfx3-ding.wav",
-   "volume": 0.45
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
   }
  ],
  "endCard": {
