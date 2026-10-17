@@ -542,8 +542,14 @@
    "end": 35.48
   },
   {
-   "text": "10–20 тысяч ₽",
+   "text": "от 10",
    "start": 35.48,
+   "end": 36.12,
+   "key": true
+  },
+  {
+   "text": "до 20 тысяч ₽",
+   "start": 36.12,
    "end": 37.64,
    "key": true
   },
@@ -945,8 +951,13 @@
   },
   {
    "at": 35.46,
-   "src": "jirafik/sfx2-gauge.wav",
-   "volume": 0.3
+   "src": "jirafik/sfx3-mouse-click.wav",
+   "volume": 0.45
+  },
+  {
+   "at": 36.1,
+   "src": "jirafik/sfx3-mouse-click.wav",
+   "volume": 0.45
   },
   {
    "at": 43.46,

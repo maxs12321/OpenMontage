@@ -55,7 +55,8 @@ for w in W:
     if not w.get("key") or w["start"]<3.4 or w["start"]>vd-1: continue
     if any(abs(w["start"]-b)<0.4 for b in bigstarts): continue             # already has zoom
     t=w["start"]-0.02
-    if any(m in w["text"] for m in money): add(t,"sfx2-gauge.wav",0.3)      # amounts: counter tick
+    if w["text"] in ("от 10","до 20 тысяч ₽"): add(t,"sfx3-mouse-click.wav",0.45)   # range: one click per number shown
+    elif any(m in w["text"] for m in money): add(t,"sfx2-gauge.wav",0.3)      # amounts: counter tick
     elif w["text"].startswith("НПД"): add(t,"sfx3-camera-click.wav",0.45)
     elif w["text"].startswith("платном"): add(t,"sfx2-charge.wav",0.4)
     elif w["text"].startswith("бесплатном"): add(t,"sfx2-appear.wav",0.35)
