@@ -23,8 +23,8 @@ add(ins[0]["start"],"sfx2-swipe.wav",0.5)                                 # scre
 # each key word: entry animation + the one sound that belongs to it (Ilya's SFX tutorial)
 PAIR={"flicker":("sfx2-charge.wav",0.45),"type":("sfx2-typing-real.wav",0.35),"scale":("sfx2-whoosh-short.wav",0.4),
       "appear":("sfx2-appear.wav",0.4),"rotate":("sfx2-paper-turn.wav",0.35),"zoom":("sfx2-zoom.wav",0.35),"count":("sfx2-gauge.wav",0.3)}
-plan=[("заблокированы",1,"flicker"),("отчётность",1,"type"),("расходы",1,"scale"),("РКО",1,"appear"),("пуэр",1,"rotate"),
-      ("РКО",2,"scale"),("Claude",1,"type"),("ПСБ",1,"zoom"),("оплата",1,"appear"),("продуктивный",1,"scale")]
+# few events, one base pair (scale+whoosh) repeated; special pairs only 1-2 per video
+plan=[("заблокированы",1,"flicker"),("РКО",1,"scale"),("ПСБ",1,"scale"),("продуктивный",1,"scale")]
 for t,n,an in plan:
     w=at(t,n); w["anim"]=an; add(w["start"]-0.02,*PAIR[an])
 S.sort(key=lambda x:x["at"]); out=[]

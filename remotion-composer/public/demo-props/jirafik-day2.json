@@ -256,8 +256,7 @@
    "text": "отчётность:",
    "start": 13.54,
    "end": 13.98,
-   "key": true,
-   "anim": "type"
+   "key": true
   },
   {
    "text": "проверяю",
@@ -334,8 +333,7 @@
    "text": "расходы,",
    "start": 19.83,
    "end": 20.35,
-   "key": true,
-   "anim": "scale"
+   "key": true
   },
   {
    "text": "задачи",
@@ -382,7 +380,7 @@
    "start": 22.55,
    "end": 22.99,
    "key": true,
-   "anim": "appear"
+   "anim": "scale"
   },
   {
    "text": "а",
@@ -448,8 +446,7 @@
    "text": "пуэр,",
    "start": 26.42,
    "end": 26.82,
-   "key": true,
-   "anim": "rotate"
+   "key": true
   },
   {
    "text": "поскольку",
@@ -565,8 +562,7 @@
    "text": "РКО,",
    "start": 33.79,
    "end": 34.58,
-   "key": true,
-   "anim": "scale"
+   "key": true
   },
   {
    "text": "написать",
@@ -612,8 +608,7 @@
    "text": "Claude",
    "start": 36.86,
    "end": 37.14,
-   "key": true,
-   "anim": "type"
+   "key": true
   },
   {
    "text": "насчет",
@@ -675,7 +670,7 @@
    "start": 41.13,
    "end": 41.45,
    "key": true,
-   "anim": "zoom"
+   "anim": "scale"
   },
   {
    "text": "поскольку",
@@ -731,8 +726,7 @@
    "text": "оплата.",
    "start": 44.21,
    "end": 44.71,
-   "key": true,
-   "anim": "appear"
+   "key": true
   },
   {
    "text": "Поэтому",
@@ -955,48 +949,18 @@
    "volume": 0.45
   },
   {
-   "at": 13.52,
-   "src": "jirafik/sfx2-typing-real.wav",
-   "volume": 0.35
-  },
-  {
    "at": 14.55,
    "src": "jirafik/sfx2-swipe.wav",
    "volume": 0.5
   },
   {
-   "at": 19.81,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.4
-  },
-  {
    "at": 22.53,
-   "src": "jirafik/sfx2-appear.wav",
-   "volume": 0.4
-  },
-  {
-   "at": 26.4,
-   "src": "jirafik/sfx2-paper-turn.wav",
-   "volume": 0.35
-  },
-  {
-   "at": 33.77,
    "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.4
-  },
-  {
-   "at": 36.84,
-   "src": "jirafik/sfx2-typing-real.wav",
-   "volume": 0.35
   },
   {
    "at": 41.11,
-   "src": "jirafik/sfx2-zoom.wav",
-   "volume": 0.35
-  },
-  {
-   "at": 44.19,
-   "src": "jirafik/sfx2-appear.wav",
+   "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.4
   },
   {
