@@ -96,6 +96,7 @@ export type JirafikVlogProps = {
     top?: number; // px from frame top (un-zoomed); place so the head overlaps the text
     align?: "left" | "center";
     size?: number;
+    font?: { family: string; weight?: number; italic?: boolean; lineHeight?: number }; // per-word typeface for variety
   }[];
   // plates on light footage: "light" = white cards, "dark" = navy cards
   plateTheme?: "light" | "dark";
@@ -113,7 +114,8 @@ export type JirafikVlogProps = {
     flash?: boolean; // white flash on cold-open cuts
     emphasisZoom?: number; // zoom on emphasis words
     vignette?: boolean; // dark edge vignette (off for bright footage)
-    jumpZoom?: number; // static punch-in on every other shot (reference "jump zoom"), e.g. 0.12
+    jumpZoom?: number; // static punch-in (reference "jump zoom"), e.g. 0.12
+    jumpRanges?: [number, number][]; // where to punch in; if omitted, every other shot
   };
 };
 
@@ -163,10 +165,11 @@ const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }
           <div
             key={i}
             style={{
-              fontFamily: TITLE,
-              fontWeight: 700,
+              fontFamily: w.font?.family ?? TITLE,
+              fontWeight: w.font?.weight ?? 700,
+              fontStyle: w.font?.italic ? "italic" : "normal",
               fontSize: size,
-              lineHeight: 0.86,
+              lineHeight: w.font?.lineHeight ?? 0.86,
               color: w.color ?? ORANGE,
               textTransform: "uppercase",
               letterSpacing: "-0.01em",
@@ -199,7 +202,8 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const prog = Math.min(local / shotLen, 1);
   const eased = prog * prog * (3 - 2 * prog);
   const pullOut = m.alternate && i % 2 === 1;
-  const jump = m.jumpZoom && i % 2 === 1 ? m.jumpZoom : 0;
+  const inJump = m.jumpRanges ? m.jumpRanges.some(([a, b]) => t >= a && t < b) : i % 2 === 1;
+  const jump = m.jumpZoom && inJump ? m.jumpZoom : 0;
   const push = (pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased) + jump;
   const punchT = Math.min(local / 0.22, 1);
   const punch = i === 0 ? 0 : m.punch * Math.pow(1 - punchT, 2);

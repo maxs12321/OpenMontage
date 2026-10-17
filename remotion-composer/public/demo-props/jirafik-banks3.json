@@ -980,8 +980,26 @@
   "handles": []
  },
  "motion": {
-  "push": 0.02,
+  "push": 0.015,
   "jumpZoom": 0.12,
+  "jumpRanges": [
+   [
+    7.846,
+    11.865
+   ],
+   [
+    27.63,
+    31.649
+   ],
+   [
+    43.664,
+    47.641
+   ],
+   [
+    55.498,
+    58.97
+   ]
+  ],
   "alternate": false,
   "punch": 0,
   "blur": 0,
@@ -1000,9 +1018,14 @@
     "АЛЬ",
     "ФА"
    ],
-   "size": 470,
-   "top": 238,
-   "align": "left"
+   "size": 291,
+   "top": 494,
+   "align": "left",
+   "font": {
+    "family": "Unbounded, sans-serif",
+    "weight": 900,
+    "lineHeight": 0.95
+   }
   },
   {
    "start": 21.04,
@@ -1010,9 +1033,14 @@
    "lines": [
     "ПСБ"
    ],
-   "size": 470,
-   "top": 545,
-   "align": "left"
+   "size": 399,
+   "top": 570,
+   "align": "left",
+   "font": {
+    "family": "'Russo One', sans-serif",
+    "weight": 400,
+    "lineHeight": 0.95
+   }
   },
   {
    "start": 30.15,
@@ -1021,9 +1049,15 @@
     "Т-",
     "БАНК"
    ],
-   "size": 375,
-   "top": 319,
-   "align": "left"
+   "size": 292,
+   "top": 438,
+   "align": "left",
+   "font": {
+    "family": "Lora, serif",
+    "weight": 700,
+    "italic": true,
+    "lineHeight": 0.9
+   }
   }
  ]
 }

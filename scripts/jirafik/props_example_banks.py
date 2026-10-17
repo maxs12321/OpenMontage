@@ -29,15 +29,19 @@ cta={"start":at("поэтому")["start"],"end":vd,"label":"Бесплатно�
 def span(t,n=1,extra=0.7):
     w=at(t,n); return round(w["start"]-0.05,3), round(w["end"]+extra,3)
 import subprocess as _sp
-spec=[("Альфа-Банк",1,["АЛЬ","ФА"]),("ПСБ",1,["ПСБ"]),("Т-Банк",1,["Т-","БАНК"]),]
+spec=[("Альфа-Банк",1,["АЛЬ","ФА"]),("ПСБ",1,["ПСБ"]),("Т-Банк",1,["Т-","БАНК"])]
+fonts={"Альфа-Банк":({"family":"Unbounded, sans-serif","weight":900,"lineHeight":0.95},0.62),
+       "ПСБ":({"family":"'Russo One', sans-serif","weight":400,"lineHeight":0.95},0.85),
+       "Т-Банк":({"family":"Lora, serif","weight":700,"italic":True,"lineHeight":0.9},0.78)}
 spans=[span(t,n) for t,n,_ in spec]
 heads=json.loads(_sp.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps([round(a+0.25,2) for a,b in spans])]).decode())
 big=[]
 for (t,n,lines),(a,b) in zip(spec,spans):
     h=heads[str(round(a+0.25,2))]["headTop"]
-    longest=max(len(l) for l in lines); size=min(470,int(1500/max(longest,2)))
-    blockH=len(lines)*size*0.86
-    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":int(h+170-blockH),"align":"left"})
+    f,k=fonts[t]
+    longest=max(len(l) for l in lines); size=int(min(470,int(1500/max(longest,2)))*k)
+    blockH=len(lines)*size*f["lineHeight"]
+    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":int(h+170-blockH),"align":"left","font":f})
 # --- SFX: each sound tied to what the text does, no two identical in a row ---
 J="jirafik/"
 S=[]
@@ -64,12 +68,18 @@ for x in S:
     if out and x["at"]-out[-1]["at"]<0.3: continue
     out.append(x)
 emph=[{"start":at("соврал")["start"],"end":at("соврал")["end"]}]
+# punch in only on a few shots that carry a key moment
+bnds=[0.0]+cuts+[vd]
+def shot_of(t):
+    for x in range(len(bnds)-1):
+        if bnds[x]<=t<bnds[x+1]: return [bnds[x],bnds[x+1]]
+jr=[shot_of(t) for t in (at("Альфа-Банк")["start"]+0.1, at("Т-Банк")["start"]+0.1, calc["start"]+0.3, cta["start"]+0.2)]
 props={"videoSrc":"jirafik/v3-cut.mp4","videoDuration":vd,"cuts":cuts,"whooshAt":[],"emphasis":emph,
  "words":W,"stickers":[],"inserts":[],"chapters":chapters,"calc":calc,"cta":cta,
  "hook":{"tag":"","line1":"3 банка","line2":"33 000 ₽","until":3.3,"teaser":"с одного клиента"},
  "hookStyle":"lower","captionStyle":"word","captionsFrom":3.3,"sfx":out,
  "endCard":{"seconds":0,"question":"","handles":[]},
- "motion":{"push":0.02,"jumpZoom":0.12,"alternate":False,"punch":0,"blur":0,"flash":False,"emphasisZoom":0.05,"vignette":False},
+ "motion":{"push":0.015,"jumpZoom":0.12,"jumpRanges":jr,"alternate":False,"punch":0,"blur":0,"flash":False,"emphasisZoom":0.05,"vignette":False},
  "plateTheme":"light","showProgress":False,"personSrc":"jirafik/v3-person.webm","bigWords":big}
 json.dump(props,open("/home/user/OpenMontage/remotion-composer/public/demo-props/jirafik-banks3.json","w"),ensure_ascii=False,indent=1)
 print("vd",vd,"cuts",cuts); print([(round(x["at"],2),x["src"].split('/')[-1][:12]) for x in out])
