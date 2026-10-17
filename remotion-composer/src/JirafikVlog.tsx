@@ -701,7 +701,7 @@ const PhotoInsert: React.FC<{ ins: VlogInsert; index: number }> = ({ ins, index 
 // Reveal: payout screenshots fan in one by one, counter climbs to the last
 // ---------------------------------------------------------------------------
 const fmt = (n: number) => Math.round(n).toLocaleString("ru-RU").replace(/,/g, " ");
-const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
+const Reveal: React.FC<{ r: VlogReveal; light?: boolean }> = ({ r, light }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const dim = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: "clamp" });
@@ -724,7 +724,7 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
       : interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ opacity: out }}>
-      <AbsoluteFill style={{ backgroundColor: `rgba(20,24,58,${0.82 * dim})` }} />
+      <AbsoluteFill style={{ backgroundColor: light ? `rgba(246,246,248,${0.9 * dim})` : `rgba(20,24,58,${0.82 * dim})` }} />
       <AbsoluteFill style={{ alignItems: "center", top: 150 }}>
         <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 44, color: ORANGE, letterSpacing: 3, opacity: dim, textAlign: "center", maxWidth: 980 }}>
           {r.title.slice(0, titleChars)}
@@ -732,11 +732,11 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
         </div>
         <div
           style={{
-            fontFamily: HEAD,
+            fontFamily: light ? TITLE : HEAD,
             fontWeight: 700,
-            fontSize: 150,
+            fontSize: light ? 170 : 150,
             lineHeight: 1.1,
-            color: last && climb > 0.98 ? GOLD : "#fff",
+            color: last && climb > 0.98 ? (light ? ORANGE : GOLD) : light ? NAVY : "#fff",
             transform: `scale(${last && climb > 0.98 ? 1.06 : 1})`,
             opacity: dim,
           }}
@@ -744,7 +744,7 @@ const Reveal: React.FC<{ r: VlogReveal }> = ({ r }) => {
           {fmt(value)} ₽
         </div>
         {r.caption && (
-          <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 40, color: LIGHT, opacity: dim * 0.9 }}>{r.caption}</div>
+          <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 40, color: light ? NAVY : LIGHT, opacity: dim * 0.9 }}>{r.caption}</div>
         )}
       </AbsoluteFill>
       {r.items.map((it, i) => {
@@ -982,7 +982,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
         <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />
         {p.reveal && (
           <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
-            <Reveal r={p.reveal} />
+            <Reveal r={p.reveal} light={p.plateTheme === "light"} />
             {(p.sfx === undefined ? p.reveal.items : []).map((_, i) => (
               <Sequence key={`dg${i}`} from={Math.round(i * ((p.reveal!.duration - 1.2) / p.reveal!.items.length) * fps)} durationInFrames={f(0.5)}>
                 <Audio src={staticFile("jirafik/ding.wav")} volume={0.18 + 0.06 * i} />

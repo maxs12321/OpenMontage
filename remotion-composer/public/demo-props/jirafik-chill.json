@@ -1,5 +1,5 @@
 {
- "videoSrc": "jirafik/chill-cut-v4.mp4",
+ "videoSrc": "jirafik/chill-cut-v5.mp4",
  "videoDuration": 31.29,
  "cuts": [
   0.75,
@@ -19,12 +19,7 @@
   26.27
  ],
  "whooshAt": [],
- "emphasis": [
-  {
-   "start": 22.7,
-   "end": 23.2
-  }
- ],
+ "emphasis": [],
  "words": [
   {
    "text": "День",
@@ -523,12 +518,28 @@
   ]
  },
  "motion": {
-  "push": 0.04,
+  "push": 0.015,
   "alternate": false,
   "punch": 0,
   "blur": 0,
   "flash": false,
-  "emphasisZoom": 0.05
+  "emphasisZoom": 0.05,
+  "vignette": false,
+  "jumpZoom": 0.12,
+  "jumpRanges": [
+   [
+    11.72,
+    14.22
+   ],
+   [
+    19.72,
+    21.22
+   ],
+   [
+    25.27,
+    26.27
+   ]
+  ]
  },
  "sfx": [
   {
@@ -537,14 +548,9 @@
    "volume": 0.4
   },
   {
-   "at": 0.17,
-   "src": "jirafik/sfx2-appear.wav",
-   "volume": 0.35
-  },
-  {
    "at": 7.46,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.35
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.6
   },
   {
    "at": 8.57,
@@ -558,13 +564,13 @@
   },
   {
    "at": 13.5,
-   "src": "jirafik/sfx2-swipe.wav",
-   "volume": 0.9
+   "src": "jirafik/sfx3-camera-shutter.wav",
+   "volume": 0.35
   },
   {
    "at": 14.68,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.35
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.6
   },
   {
    "at": 19.59,
@@ -573,28 +579,23 @@
   },
   {
    "at": 20.03,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-appear.wav",
+   "volume": 0.35
   },
   {
    "at": 22.68,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 25.29,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.4
+   "src": "jirafik/sfx3-camera-click.wav",
+   "volume": 0.45
   },
   {
    "at": 27.69,
-   "src": "jirafik/sfx2-zoom.wav",
-   "volume": 0.3
-  },
-  {
-   "at": 27.72,
    "src": "jirafik/sfx3-mac-typing.wav",
-   "volume": 0.35
+   "volume": 0.3
   },
   {
    "at": 28.64,
@@ -608,5 +609,7 @@
   }
  ],
  "captionStyle": "word",
- "hookStyle": "lower"
+ "hookStyle": "lower",
+ "plateTheme": "light",
+ "showProgress": false
 }
