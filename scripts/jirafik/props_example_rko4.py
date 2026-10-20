@@ -18,7 +18,10 @@ def at(txt,n=1):
     raise KeyError(txt)
 vd=round(d["total"]-0.07,3)
 # big words behind the speaker: entities only, where he is on camera
-spec=[("ИП",1,["ИП"],({"family":"'Russo One', sans-serif","weight":400,"lineHeight":0.95},0.85),0.9),
+spec=[("РКО",2,["РКО"],({"family":"'Rubik Mono One', sans-serif","weight":400,"lineHeight":0.95},1),0.9),
+      ("ИП",1,["ИП"],({"family":"'Russo One', sans-serif","weight":400,"lineHeight":0.95},0.85),0.9),
+      ("заработок",1,["ЗАРАБОТОК"],({"family":"Oswald, sans-serif","weight":700,"lineHeight":0.9},1),0.9),
+      ("клиентов",1,["КЛИЕНТЫ"],({"family":"Lora, serif","weight":700,"italic":True,"lineHeight":0.9},1),0.9),
       ("мотив",1,["МОТИВ","ТРАФИК"],({"family":"Unbounded, sans-serif","weight":900,"lineHeight":0.95},0.62),1.0)]
 spans=[]
 for t,n,lines,fk,extra in spec:
@@ -26,7 +29,7 @@ for t,n,lines,fk,extra in spec:
 probe=[round(a+0.25,2) for a,b in spans]
 heads=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps(probe)]).decode())
 from PIL import ImageFont
-FF={"Russo One":("/root/.fonts/RussoOne-Regular.ttf",1.0),"Unbounded":("/root/.fonts/Unbounded-Variable.ttf",1.12)}
+FF={"Russo One":("/root/.fonts/RussoOne-Regular.ttf",1.0),"Unbounded":("/root/.fonts/Unbounded-Variable.ttf",1.12),"Rubik Mono":("/root/.fonts/RubikMonoOne-Regular.ttf",1.0),"Oswald":("/root/.fonts/Oswald-Variable.ttf",1.1),"Lora":("/root/.fonts/Lora-Italic-Variable.ttf",1.1)}
 def width(text,fam,size):
     for k,(path,mul) in FF.items():
         if k in fam: return ImageFont.truetype(path,size).getlength(text)*mul
@@ -37,14 +40,14 @@ for (t,n,lines,(f,k),_),(a,b),p in zip(spec,spans,probe):
     size=300
     while max(width(l,f["family"],size) for l in lines)>740: size-=5
     blockH=len(lines)*size*f["lineHeight"]
-    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":max(260,int(h+110-blockH)),"align":"center","font":f})
+    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":max(260,int(h+45-blockH)),"align":"center","font":f})
 cta={"start":at("так")["start"],"end":vd,"label":"Мотив-трафик и связки — в бесплатном обучении","handle":"@jirafiktrafik"}
 J="jirafik/"; S=[]
 def add(t,src,vol): S.append({"at":round(t,3),"src":J+src,"volume":vol})
 add(0.0,"sfx2-appear.wav",0.4)                                  # hook
 for b in big: add(b["start"],"sfx2-zoom.wav",0.35)             # big word flies in
 PAIR={"scale":("sfx2-whoosh-short.wav",0.4),"type":("sfx2-typing-real.wav",0.35)}
-plan=[("НПД",1,"type"),("заработок",1,"scale"),("оплата",1,"scale"),("клиентов",1,"scale")]
+plan=[("НПД",1,"type"),("оплата",1,"scale")]
 for t,n,an in plan:
     w=at(t,n); w["anim"]=an; add(w["start"]-0.02,*PAIR[an])
 add(cta["start"],"sfx2-whoosh-short.wav",0.4)                  # CTA card scales in
@@ -75,7 +78,7 @@ mids=[round((r[0]+r[1])/2,2) for r in jr]
 hp=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps(mids)]).decode())
 for r,m in zip(jr,mids):
     h=hp[str(m)]; r+= [round(100*(h["headTop"]+170)/1920,1), round(100*h["cx"]/1080,1)]
-TR=[(SC[0],"zoomin"),(SC[1],"whip"),(SC[3],"whip"),(SC[4],"flash"),(SC[5],"whip")]
+TR=[(SC[0],"whip"),(SC[1],"whip"),(SC[3],"whip"),(SC[4],"whip"),(SC[5],"whip")]
 TS={"flash":("sfx3-camera-shutter.wav",0.4,-0.08),"whip":("sfx2-swipe.wav",0.55,-0.12),"zoomin":("sfx2-zoom.wav",0.4,-0.2)}
 for at_,ty in TR:
     src,vol,off=TS[ty]; out.append({"at":round(at_+off,3),"src":J+src,"volume":vol})

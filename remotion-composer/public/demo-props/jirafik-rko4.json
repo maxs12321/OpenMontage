@@ -432,8 +432,7 @@
    "text": "заработок",
    "start": 27.0,
    "end": 27.48,
-   "key": true,
-   "anim": "scale"
+   "key": true
   },
   {
    "text": "и",
@@ -726,8 +725,7 @@
    "text": "клиентов?",
    "start": 45.56,
    "end": 46.46,
-   "key": true,
-   "anim": "scale"
+   "key": true
   },
   {
    "text": "Для",
@@ -1133,9 +1131,14 @@
    "volume": 0.4
   },
   {
-   "at": 2.033,
+   "at": 2.113,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 2.52,
    "src": "jirafik/sfx2-zoom.wav",
-   "volume": 0.4
+   "volume": 0.35
   },
   {
    "at": 9.81,
@@ -1158,14 +1161,14 @@
    "volume": 0.55
   },
   {
-   "at": 26.98,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.4
+   "at": 26.95,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
-   "at": 29.22,
-   "src": "jirafik/sfx3-camera-shutter.wav",
-   "volume": 0.4
+   "at": 29.18,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
   },
   {
    "at": 36.66,
@@ -1178,9 +1181,9 @@
    "volume": 0.55
   },
   {
-   "at": 45.54,
-   "src": "jirafik/sfx2-whoosh-short.wav",
-   "volume": 0.4
+   "at": 45.51,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
   },
   {
    "at": 58.94,
@@ -1234,7 +1237,7 @@
  "transitions": [
   {
    "at": 2.233,
-   "type": "zoomin",
+   "type": "whip",
    "dir": 1
   },
   {
@@ -1249,7 +1252,7 @@
   },
   {
    "at": 29.3,
-   "type": "flash",
+   "type": "whip",
    "dir": -1
   },
   {
@@ -1263,18 +1266,64 @@
  "personSrc": "jirafik/v4-person.webm",
  "bigWords": [
   {
+   "start": 2.52,
+   "end": 3.92,
+   "lines": [
+    "РКО"
+   ],
+   "size": 290,
+   "top": 285,
+   "align": "center",
+   "font": {
+    "family": "'Rubik Mono One', sans-serif",
+    "weight": 400,
+    "lineHeight": 0.95
+   }
+  },
+  {
    "start": 9.81,
    "end": 11.21,
    "lines": [
     "ИП"
    ],
    "size": 300,
-   "top": 367,
+   "top": 302,
    "align": "center",
    "font": {
     "family": "'Russo One', sans-serif",
     "weight": 400,
     "lineHeight": 0.95
+   }
+  },
+  {
+   "start": 26.95,
+   "end": 28.35,
+   "lines": [
+    "ЗАРАБОТОК"
+   ],
+   "size": 150,
+   "top": 440,
+   "align": "center",
+   "font": {
+    "family": "Oswald, sans-serif",
+    "weight": 700,
+    "lineHeight": 0.9
+   }
+  },
+  {
+   "start": 45.51,
+   "end": 46.91,
+   "lines": [
+    "КЛИЕНТЫ"
+   ],
+   "size": 130,
+   "top": 448,
+   "align": "center",
+   "font": {
+    "family": "Lora, serif",
+    "weight": 700,
+    "italic": true,
+    "lineHeight": 0.9
    }
   },
   {
@@ -1285,7 +1334,7 @@
     "ТРАФИК"
    ],
    "size": 120,
-   "top": 471,
+   "top": 406,
    "align": "center",
    "font": {
     "family": "Unbounded, sans-serif",
