@@ -1133,8 +1133,8 @@
    "volume": 0.4
   },
   {
-   "at": 2.183,
-   "src": "jirafik/sfx3-camera-shutter.wav",
+   "at": 2.033,
+   "src": "jirafik/sfx2-zoom.wav",
    "volume": 0.4
   },
   {
@@ -1143,9 +1143,9 @@
    "volume": 0.35
   },
   {
-   "at": 12.537,
-   "src": "jirafik/sfx4-deep-woosh.wav",
-   "volume": 0.5
+   "at": 12.547,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
   },
   {
    "at": 19.2,
@@ -1153,9 +1153,9 @@
    "volume": 0.35
   },
   {
-   "at": 22.633,
-   "src": "jirafik/sfx3-mouse-click.wav",
-   "volume": 0.5
+   "at": 22.513,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
   },
   {
    "at": 26.98,
@@ -1163,9 +1163,9 @@
    "volume": 0.4
   },
   {
-   "at": 29.17,
-   "src": "jirafik/sfx4-deep-woosh.wav",
-   "volume": 0.5
+   "at": 29.22,
+   "src": "jirafik/sfx3-camera-shutter.wav",
+   "volume": 0.4
   },
   {
    "at": 36.66,
@@ -1173,9 +1173,9 @@
    "volume": 0.4
   },
   {
-   "at": 43.283,
-   "src": "jirafik/sfx3-camera-shutter.wav",
-   "volume": 0.4
+   "at": 43.213,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
   },
   {
    "at": 45.54,
@@ -1234,23 +1234,28 @@
  "transitions": [
   {
    "at": 2.233,
-   "type": "flash"
+   "type": "zoomin",
+   "dir": 1
   },
   {
    "at": 12.667,
-   "type": "stretch"
+   "type": "whip",
+   "dir": -1
   },
   {
    "at": 22.633,
-   "type": "click"
+   "type": "whip",
+   "dir": 1
   },
   {
    "at": 29.3,
-   "type": "stretch"
+   "type": "flash",
+   "dir": -1
   },
   {
    "at": 43.333,
-   "type": "flash"
+   "type": "whip",
+   "dir": 1
   }
  ],
  "plateTheme": "light",

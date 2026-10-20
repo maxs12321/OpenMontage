@@ -3,6 +3,7 @@ import {
   AbsoluteFill,
   Audio,
   CalculateMetadataFunction,
+  Freeze,
   Img,
   OffthreadVideo,
   Sequence,
@@ -104,8 +105,8 @@ export type JirafikVlogProps = {
   // plates on light footage: "light" = white cards, "dark" = navy cards
   plateTheme?: "light" | "dark";
   // Transitions on shot changes (Ilya's tutorial), each with its own sound in sfx:
-  // stretch→deep woosh, flash→camera shutter, click→mouse click, glitch→glitch sound. Never "tetris".
-  transitions?: { at: number; type: "stretch" | "flash" | "click" | "glitch" }[];
+  // whip→swipe, zoomin→zoom (Fuwa), flash→camera shutter (stretch/click/glitch kept as extras). Never "tetris".
+  transitions?: { at: number; type: "whip" | "zoomin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
   captionsFrom: number;
@@ -216,15 +217,29 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const originY = range?.[3] ?? 50;
   const originX = range?.[4] ?? 50;
   // transition around a cut: d = seconds from the cut
-  let tScaleY = 1, tShift = 0, tBlur = 0;
+  let tScaleY = 1, tShift = 0, tBlur = 0, tZoom = 0, tBright = 1, mbX = 0;
+  let whip: { x: number; dir: number; at: number; before: boolean } | null = null;
+  const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
   for (const tr of p.transitions ?? []) {
     const d = t - tr.at;
+    if (tr.type === "whip" && d >= -0.1 && d < 0.1) {
+      const q = (d + 0.1) / 0.2;
+      whip = { x: ease(q), dir: tr.dir ?? 1, at: tr.at, before: d < 0 };
+      mbX = 46 * Math.sin(Math.PI * q);
+    }
+    if (tr.type === "zoomin" && d > -0.16 && d < 0.18) {
+      const k = d < 0 ? Math.pow((d + 0.16) / 0.16, 2) : Math.pow(1 - d / 0.18, 2);
+      tZoom = 1.4 * k; tBlur = 16 * k; tBright = 1 + 0.25 * k;
+    }
+    if (tr.type === "flash" && d > -0.1 && d < 0.3) {
+      const k = d < 0 ? (d + 0.1) / 0.1 : Math.pow(1 - d / 0.3, 1.6);
+      tBright = 1 + 0.9 * k; tZoom = 0.04 * k;
+    }
     if (tr.type === "stretch" && d > -0.13 && d < 0.17) {
       const k = d < 0 ? (d + 0.13) / 0.13 : 1 - d / 0.17;
       tScaleY = 1 + 0.45 * k * k; tShift = (d < 0 ? -1 : 1) * 260 * k * k; tBlur = 9 * k;
     }
     if (tr.type === "click" && d >= 0 && d < 0.12) tBlur = 10 * (1 - d / 0.12);
-    if (tr.type === "glitch" && d > -0.07 && d < 0.1) tBlur = 0;
   }
   const push = (pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased) + jump;
   const punchT = Math.min(local / 0.22, 1);
@@ -239,15 +254,38 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
     }
   }
   const flash = m.flash && i > 0 && t < p.hook.until ? Math.max(0, 0.55 - local * 5) : 0;
+  const sc = push + punch + emph + tZoom;
+  const layerStyle = (x: number): React.CSSProperties => ({
+    transform: `translateX(${x}px) translateY(${tShift}px) scale(${sc}, ${sc * tScaleY})`,
+    transformOrigin: `${originX}% ${originY}%`,
+  });
+  const W = 1080;
+  // whip pan: outgoing and incoming shots slide together; the other shot is a frozen frame
+  const mainX = whip ? (whip.before ? -whip.dir * whip.x * W : whip.dir * (1 - whip.x) * W) : 0;
+  const otherX = whip ? (whip.before ? whip.dir * (1 - whip.x) * W : -whip.dir * whip.x * W) : 0;
+  const otherFrame = whip ? (whip.before ? Math.round(whip.at * fps) + 1 : Math.round(whip.at * fps) - 1) : 0;
+  const isoBlur = Math.max(blur, tBlur);
+  const filters = [
+    isoBlur > 0.2 ? `blur(${isoBlur}px)` : "",
+    mbX > 0.5 ? "url(#jv-mb)" : "",
+    tBright > 1.01 ? `brightness(${tBright}) saturate(${1 + (tBright - 1) * 0.15})` : "",
+  ].filter(Boolean).join(" ");
   return (
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: "#000" }}>
-      <AbsoluteFill
-        style={{
-          transform: `translateY(${tShift}px) scale(${push + punch + emph}, ${(push + punch + emph) * tScaleY})`,
-          transformOrigin: `${originX}% ${originY}%`,
-          filter: Math.max(blur, tBlur) > 0.2 ? `blur(${Math.max(blur, tBlur)}px)` : undefined,
-        }}
-      >
+      <svg width={0} height={0} style={{ position: "absolute" }}>
+        <filter id="jv-mb" x="-20%" y="0" width="140%" height="100%">
+          <feGaussianBlur stdDeviation={`${mbX} 0`} />
+        </filter>
+      </svg>
+      <AbsoluteFill style={{ filter: filters || undefined }}>
+      {whip && (
+        <AbsoluteFill style={layerStyle(otherX)}>
+          <Freeze frame={otherFrame}>
+            <OffthreadVideo src={resolveAsset(p.videoSrc)} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </Freeze>
+        </AbsoluteFill>
+      )}
+      <AbsoluteFill style={layerStyle(mainX)}>
         <OffthreadVideo
           src={resolveAsset(p.videoSrc)}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -271,6 +309,7 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
               </Sequence>
             );
           })}
+      </AbsoluteFill>
       </AbsoluteFill>
       {/* soft vignette keeps text readable on bright shots */}
       {m.vignette && (
@@ -434,11 +473,12 @@ const TransitionFx: React.FC<{ list: NonNullable<JirafikVlogProps["transitions"]
     <>
       {list.map((tr, i) => {
         const d = t - tr.at;
-        if (tr.type === "flash" && d > -0.1 && d < 0.22) {
-          const k = d < 0 ? (d + 0.1) / 0.1 : 1 - d / 0.22;
+        if (tr.type === "flash" && d > -0.1 && d < 0.3) {
+          // soft light-leak bloom; the video itself is over-exposed in MovingVideo
+          const k = d < 0 ? (d + 0.1) / 0.1 : Math.pow(1 - d / 0.3, 1.6);
           return (
-            <AbsoluteFill key={i} style={{ opacity: Math.min(1, k * 1.15),
-              background: `radial-gradient(circle at 50% 40%, rgba(255,250,235,${0.95 * k}) 0%, rgba(255,190,90,0.85) 45%, rgba(242,138,46,0.75) 100%)` }} />
+            <AbsoluteFill key={i} style={{ opacity: 0.7 * k, mixBlendMode: "screen",
+              background: "radial-gradient(ellipse 70% 55% at 75% 30%, rgba(255,214,150,1) 0%, rgba(255,170,90,0.55) 40%, rgba(255,255,255,0) 75%)" }} />
           );
         }
         if (tr.type === "click" && d >= 0 && d < 0.3) {

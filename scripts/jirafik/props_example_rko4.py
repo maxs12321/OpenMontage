@@ -75,12 +75,12 @@ mids=[round((r[0]+r[1])/2,2) for r in jr]
 hp=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps(mids)]).decode())
 for r,m in zip(jr,mids):
     h=hp[str(m)]; r+= [round(100*(h["headTop"]+170)/1920,1), round(100*h["cx"]/1080,1)]
-TR=[(SC[0],"flash"),(SC[1],"stretch"),(SC[3],"click"),(SC[4],"stretch"),(SC[5],"flash")]
-TS={"flash":("sfx3-camera-shutter.wav",0.4,-0.05),"stretch":("sfx4-deep-woosh.wav",0.5,-0.13),"click":("sfx3-mouse-click.wav",0.5,0.0)}
+TR=[(SC[0],"zoomin"),(SC[1],"whip"),(SC[3],"whip"),(SC[4],"flash"),(SC[5],"whip")]
+TS={"flash":("sfx3-camera-shutter.wav",0.4,-0.08),"whip":("sfx2-swipe.wav",0.55,-0.12),"zoomin":("sfx2-zoom.wav",0.4,-0.2)}
 for at_,ty in TR:
     src,vol,off=TS[ty]; out.append({"at":round(at_+off,3),"src":J+src,"volume":vol})
 out.sort(key=lambda x:x["at"])
-transitions=[{"at":a_,"type":t_} for a_,t_ in TR]
+transitions=[{"at":a_,"type":t_,"dir":[1,-1][k%2]} for k,(a_,t_) in enumerate(TR)]
 props={"videoSrc":"jirafik/v4-cut.mp4","videoDuration":vd,"cuts":cuts,"whooshAt":[],"emphasis":[],
  "words":W,"stickers":[],"inserts":[],"cta":cta,
  "hook":{"tag":"","line1":"Ниша РКО","line2":"простыми словами","until":2.4,"teaser":"что это и откуда деньги"},
