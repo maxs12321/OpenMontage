@@ -1,5 +1,9 @@
 import json, subprocess
-d=json.load(open("timeline.json")); W=d["words"]; cuts=d["cuts"]
+d=json.load(open("timeline.json")); W=d["words"]
+SC=[2.233,12.667,17.7,22.633,29.3,43.333,46.233]          # real shot changes (ffmpeg scene detect on cut.mp4)
+off=[];t_=0
+for a_,b_ in d["segs"]: off.append(t_); t_+=b_-a_
+cuts=sorted(set(SC+[round(o,3) for o in off[1:]])); cuts=[c for k,c in enumerate(cuts) if k==0 or c-cuts[k-1]>0.4]
 # sentence starts capitalised
 prev="."
 for w in W:
@@ -21,12 +25,19 @@ for t,n,lines,fk,extra in spec:
     w=at(t,n); spans.append((round(w["start"]-0.05,3),round(w["start"]+extra+0.45,3)))
 probe=[round(a+0.25,2) for a,b in spans]
 heads=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps(probe)]).decode())
+from PIL import ImageFont
+FF={"Russo One":("/root/.fonts/RussoOne-Regular.ttf",1.0),"Unbounded":("/root/.fonts/Unbounded-Variable.ttf",1.12)}
+def width(text,fam,size):
+    for k,(path,mul) in FF.items():
+        if k in fam: return ImageFont.truetype(path,size).getlength(text)*mul
+    return len(text)*size*0.6
 big=[]
 for (t,n,lines,(f,k),_),(a,b),p in zip(spec,spans,probe):
     h=heads[str(p)]["headTop"]
-    longest=max(len(l) for l in lines); size=int(min(470,int(1500/max(longest,2)))*k)
+    size=300
+    while max(width(l,f["family"],size) for l in lines)>740: size-=5
     blockH=len(lines)*size*f["lineHeight"]
-    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":max(60,int(h+170-blockH)),"align":"left","font":f})
+    big.append({"start":a,"end":b,"lines":lines,"size":size,"top":max(260,int(h+110-blockH)),"align":"center","font":f})
 cta={"start":at("так")["start"],"end":vd,"label":"Мотив-трафик и связки — в бесплатном обучении","handle":"@jirafiktrafik"}
 J="jirafik/"; S=[]
 def add(t,src,vol): S.append({"at":round(t,3),"src":J+src,"volume":vol})
@@ -41,17 +52,41 @@ S.sort(key=lambda x:x["at"]); out=[]
 for x in S:
     if out and x["at"]-out[-1]["at"]<0.3: continue
     out.append(x)
-bnds=[0.0]+cuts+[vd]
-def shot_of(t):
-    for i in range(len(bnds)-1):
-        if bnds[i]<=t<bnds[i+1]: return [bnds[i],bnds[i+1]]
-jr=[shot_of(t) for t in (at("возражение")["start"]-0.5, at("клиентов")["start"], cta["start"]+0.2)]
+FACE=[(SC[0],SC[1]),(SC[3],SC[4]),(SC[5],vd)]   # shots where he is on camera
+gaps=[(W[i]["end"],W[i+1]["start"]) for i in range(len(W)-1)]
+def snap(x):
+    near=[c for c in cuts if abs(c-x)<1.2]
+    if near: return min(near,key=lambda c:abs(c-x))
+    cand=[(g1-g0,(g0+g1)/2) for g0,g1 in gaps if abs((g0+g1)/2-x)<1.2]
+    return round(max(cand)[1],3) if cand else x
+jr=[]; levels=[0,0.16,0,0.26]
+for fa,fb in FACE:
+    pts=[fa]; x=fa
+    while fb-x>7:
+        x=snap(x+5)
+        for bw in big:   # never change angle while a big word is behind him
+            if bw["start"]-0.2<x<bw["end"]+0.1: x=round(min(g1 for g0,g1 in gaps if g0>=bw["end"]),3)
+        pts.append(x)
+    pts.append(fb)
+    for k in range(len(pts)-1):
+        z=levels[k%4]
+        if z: jr.append([round(pts[k],3),round(pts[k+1],3),z])
+mids=[round((r[0]+r[1])/2,2) for r in jr]
+hp=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/python","-I","/home/user/OpenMontage/scripts/jirafik/headpos.py","build/person.webm",json.dumps(mids)]).decode())
+for r,m in zip(jr,mids):
+    h=hp[str(m)]; r+= [round(100*(h["headTop"]+170)/1920,1), round(100*h["cx"]/1080,1)]
+TR=[(SC[0],"flash"),(SC[1],"stretch"),(SC[3],"click"),(SC[4],"stretch"),(SC[5],"flash")]
+TS={"flash":("sfx3-camera-shutter.wav",0.4,-0.05),"stretch":("sfx4-deep-woosh.wav",0.5,-0.13),"click":("sfx3-mouse-click.wav",0.5,0.0)}
+for at_,ty in TR:
+    src,vol,off=TS[ty]; out.append({"at":round(at_+off,3),"src":J+src,"volume":vol})
+out.sort(key=lambda x:x["at"])
+transitions=[{"at":a_,"type":t_} for a_,t_ in TR]
 props={"videoSrc":"jirafik/v4-cut.mp4","videoDuration":vd,"cuts":cuts,"whooshAt":[],"emphasis":[],
  "words":W,"stickers":[],"inserts":[],"cta":cta,
  "hook":{"tag":"","line1":"Ниша РКО","line2":"простыми словами","until":2.4,"teaser":"что это и откуда деньги"},
  "hookStyle":"lower","captionStyle":"word","captionsFrom":2.4,"sfx":out,
  "endCard":{"seconds":0,"question":"","handles":[]},
  "motion":{"push":0.015,"jumpZoom":0.12,"jumpRanges":jr,"alternate":False,"punch":0,"blur":0,"flash":False,"emphasisZoom":0.05,"vignette":False},
- "plateTheme":"light","showProgress":False,"personSrc":"jirafik/v4-person.webm","bigWords":big}
+ "transitions":transitions,"plateTheme":"light","showProgress":False,"personSrc":"jirafik/v4-person.webm","bigWords":big}
 json.dump(props,open("/home/user/OpenMontage/remotion-composer/public/demo-props/jirafik-rko4.json","w"),ensure_ascii=False,indent=1)
-print("vd",vd,"jr",jr); print(big); print([(x["at"],x["src"].split('/')[-1]) for x in out])
+print("vd",vd); print("jr",jr); print("tr",transitions); print(big); print([(x["at"],x["src"].split('/')[-1]) for x in out])

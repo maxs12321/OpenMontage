@@ -103,6 +103,9 @@ export type JirafikVlogProps = {
   }[];
   // plates on light footage: "light" = white cards, "dark" = navy cards
   plateTheme?: "light" | "dark";
+  // Transitions on shot changes (Ilya's tutorial), each with its own sound in sfx:
+  // stretch→deep woosh, flash→camera shutter, click→mouse click, glitch→glitch sound. Never "tetris".
+  transitions?: { at: number; type: "stretch" | "flash" | "click" | "glitch" }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
   captionsFrom: number;
@@ -118,7 +121,9 @@ export type JirafikVlogProps = {
     emphasisZoom?: number; // zoom on emphasis words
     vignette?: boolean; // dark edge vignette (off for bright footage)
     jumpZoom?: number; // static punch-in (reference "jump zoom"), e.g. 0.12
-    jumpRanges?: [number, number][]; // where to punch in; if omitted, every other shot
+    // where to punch in; if omitted, every other shot. Optional 3rd = zoom for that range,
+    // 4th/5th = vertical/horizontal origin in % (aim the close-up at the face).
+    jumpRanges?: ([number, number] | [number, number, number] | [number, number, number, number] | [number, number, number, number, number])[];
   };
 };
 
@@ -205,8 +210,22 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const prog = Math.min(local / shotLen, 1);
   const eased = prog * prog * (3 - 2 * prog);
   const pullOut = m.alternate && i % 2 === 1;
-  const inJump = m.jumpRanges ? m.jumpRanges.some(([a, b]) => t >= a && t < b) : i % 2 === 1;
-  const jump = m.jumpZoom && inJump ? m.jumpZoom : 0;
+  const range = m.jumpRanges ? m.jumpRanges.find(([a, b]) => t >= a && t < b) : undefined;
+  const inJump = m.jumpRanges ? !!range : i % 2 === 1;
+  const jump = inJump ? (range?.[2] ?? m.jumpZoom ?? 0) : 0;
+  const originY = range?.[3] ?? 50;
+  const originX = range?.[4] ?? 50;
+  // transition around a cut: d = seconds from the cut
+  let tScaleY = 1, tShift = 0, tBlur = 0;
+  for (const tr of p.transitions ?? []) {
+    const d = t - tr.at;
+    if (tr.type === "stretch" && d > -0.13 && d < 0.17) {
+      const k = d < 0 ? (d + 0.13) / 0.13 : 1 - d / 0.17;
+      tScaleY = 1 + 0.45 * k * k; tShift = (d < 0 ? -1 : 1) * 260 * k * k; tBlur = 9 * k;
+    }
+    if (tr.type === "click" && d >= 0 && d < 0.12) tBlur = 10 * (1 - d / 0.12);
+    if (tr.type === "glitch" && d > -0.07 && d < 0.1) tBlur = 0;
+  }
   const push = (pullOut ? 1.01 + m.push * (1 - eased) : 1.01 + m.push * eased) + jump;
   const punchT = Math.min(local / 0.22, 1);
   const punch = i === 0 ? 0 : m.punch * Math.pow(1 - punchT, 2);
@@ -224,8 +243,9 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: "#000" }}>
       <AbsoluteFill
         style={{
-          transform: `scale(${push + punch + emph})`,
-          filter: blur > 0.2 ? `blur(${blur}px)` : undefined,
+          transform: `translateY(${tShift}px) scale(${push + punch + emph}, ${(push + punch + emph) * tScaleY})`,
+          transformOrigin: `${originX}% ${originY}%`,
+          filter: Math.max(blur, tBlur) > 0.2 ? `blur(${Math.max(blur, tBlur)}px)` : undefined,
         }}
       >
         <OffthreadVideo
@@ -399,6 +419,58 @@ const HookFlash: React.FC<{ flash: NonNullable<JirafikVlogProps["hook"]["flash"]
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
+  );
+};
+
+
+// ---------------------------------------------------------------------------
+// Transition overlays: warm flash, click burst, glitch slices
+// ---------------------------------------------------------------------------
+const TransitionFx: React.FC<{ list: NonNullable<JirafikVlogProps["transitions"]>; src: string }> = ({ list, src }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  return (
+    <>
+      {list.map((tr, i) => {
+        const d = t - tr.at;
+        if (tr.type === "flash" && d > -0.1 && d < 0.22) {
+          const k = d < 0 ? (d + 0.1) / 0.1 : 1 - d / 0.22;
+          return (
+            <AbsoluteFill key={i} style={{ opacity: Math.min(1, k * 1.15),
+              background: `radial-gradient(circle at 50% 40%, rgba(255,250,235,${0.95 * k}) 0%, rgba(255,190,90,0.85) 45%, rgba(242,138,46,0.75) 100%)` }} />
+          );
+        }
+        if (tr.type === "click" && d >= 0 && d < 0.3) {
+          const k = d / 0.3;
+          const len = 40 + 50 * k;
+          return (
+            <AbsoluteFill key={i} style={{ opacity: 1 - k }}>
+              {[-60, -20, 20].map((a, j) => (
+                <div key={j} style={{ position: "absolute", left: 800, top: 560, width: len, height: 14, borderRadius: 7, background: "#fff",
+                  transformOrigin: "0 50%", transform: `rotate(${a - 90}deg) translateX(${30 + 60 * k}px)`, boxShadow: "0 0 10px rgba(0,0,0,0.3)" }} />
+              ))}
+            </AbsoluteFill>
+          );
+        }
+        if (tr.type === "glitch" && d > -0.07 && d < 0.1) {
+          const seed = Math.floor(frame * 7.3);
+          const rows = Array.from({ length: 9 }, (_, j) => ((seed * (j + 3) * 37) % 100) / 100);
+          return (
+            <AbsoluteFill key={i}>
+              {rows.map((r, j) => (
+                <div key={j} style={{ position: "absolute", left: 0, right: 0, top: `${(j * 11 + r * 6) % 100}%`, height: `${3 + r * 6}%`, overflow: "hidden" }}>
+                  <OffthreadVideo src={resolveAsset(src)} muted style={{ position: "absolute", top: `-${((j * 11 + r * 6) % 100) * 19.2}px`, width: 1080, height: 1920,
+                    objectFit: "cover", transform: `translateX(${(r - 0.5) * 160}px)`, mixBlendMode: j % 2 ? "screen" : "normal",
+                    filter: j % 3 === 0 ? "hue-rotate(160deg) saturate(3)" : undefined }} />
+                </div>
+              ))}
+            </AbsoluteFill>
+          );
+        }
+        return null;
+      })}
+    </>
   );
 };
 
@@ -998,6 +1070,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
     <AbsoluteFill style={{ backgroundColor: NAVY }}>
       <Sequence durationInFrames={vf}>
         <MovingVideo {...p} />
+        {p.transitions && <TransitionFx list={p.transitions} src={p.videoSrc} />}
         {p.stickers.map((s, i) => (
           <Sequence key={`st${i}`} from={f(s.start)} durationInFrames={f(s.duration)}>
             <Sticker s={s} index={i} />

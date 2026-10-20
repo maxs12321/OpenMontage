@@ -2,24 +2,14 @@
  "videoSrc": "jirafik/v4-cut.mp4",
  "videoDuration": 69.79,
  "cuts": [
-  3.999,
+  2.233,
   7.86,
-  11.817,
-  15.848,
-  19.848,
-  22.8,
-  23.623,
-  27.606,
-  31.605,
-  35.604,
-  39.603,
-  43.36,
-  46.27,
-  47.144,
-  51.144,
-  55.143,
-  59.175,
-  63.157,
+  12.667,
+  17.7,
+  22.633,
+  29.3,
+  43.333,
+  46.233,
   66.81
  ],
  "whooshAt": [],
@@ -1143,9 +1133,19 @@
    "volume": 0.4
   },
   {
+   "at": 2.183,
+   "src": "jirafik/sfx3-camera-shutter.wav",
+   "volume": 0.4
+  },
+  {
    "at": 9.81,
    "src": "jirafik/sfx2-zoom.wav",
    "volume": 0.35
+  },
+  {
+   "at": 12.537,
+   "src": "jirafik/sfx4-deep-woosh.wav",
+   "volume": 0.5
   },
   {
    "at": 19.2,
@@ -1153,13 +1153,28 @@
    "volume": 0.35
   },
   {
+   "at": 22.633,
+   "src": "jirafik/sfx3-mouse-click.wav",
+   "volume": 0.5
+  },
+  {
    "at": 26.98,
    "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.4
   },
   {
+   "at": 29.17,
+   "src": "jirafik/sfx4-deep-woosh.wav",
+   "volume": 0.5
+  },
+  {
    "at": 36.66,
    "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 43.283,
+   "src": "jirafik/sfx3-camera-shutter.wav",
    "volume": 0.4
   },
   {
@@ -1189,15 +1204,24 @@
   "jumpRanges": [
    [
     7.86,
-    11.817
+    12.667,
+    0.16,
+    37.2,
+    34.2
    ],
    [
-    43.36,
-    46.27
+    48.99,
+    55.15,
+    0.16,
+    40.7,
+    44.3
    ],
    [
-    63.157,
-    66.81
+    61.07,
+    66.81,
+    0.26,
+    40.5,
+    39.1
    ]
   ],
   "alternate": false,
@@ -1207,6 +1231,28 @@
   "emphasisZoom": 0.05,
   "vignette": false
  },
+ "transitions": [
+  {
+   "at": 2.233,
+   "type": "flash"
+  },
+  {
+   "at": 12.667,
+   "type": "stretch"
+  },
+  {
+   "at": 22.633,
+   "type": "click"
+  },
+  {
+   "at": 29.3,
+   "type": "stretch"
+  },
+  {
+   "at": 43.333,
+   "type": "flash"
+  }
+ ],
  "plateTheme": "light",
  "showProgress": false,
  "personSrc": "jirafik/v4-person.webm",
@@ -1217,9 +1263,9 @@
    "lines": [
     "ИП"
    ],
-   "size": 399,
-   "top": 332,
-   "align": "left",
+   "size": 300,
+   "top": 367,
+   "align": "center",
    "font": {
     "family": "'Russo One', sans-serif",
     "weight": 400,
@@ -1233,9 +1279,9 @@
     "МОТИВ",
     "ТРАФИК"
    ],
-   "size": 155,
-   "top": 464,
-   "align": "left",
+   "size": 120,
+   "top": 471,
+   "align": "center",
    "font": {
     "family": "Unbounded, sans-serif",
     "weight": 900,
