@@ -666,7 +666,7 @@
    "end": 41.13
   },
   {
-   "text": "ПСБ,",
+   "text": "РКО,",
    "start": 41.13,
    "end": 41.45,
    "key": true,
@@ -1006,13 +1006,12 @@
    "start": 4.15,
    "end": 5.75,
    "lines": [
-    "5",
-    "ИСТОЧ",
+    "5 ИСТОЧ-",
     "НИКОВ"
    ],
-   "size": 234,
-   "top": 62,
-   "align": "left",
+   "size": 150,
+   "top": 319,
+   "align": "center",
    "font": {
     "family": "'Russo One', sans-serif",
     "weight": 400,
