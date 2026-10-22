@@ -1,16 +1,23 @@
 import sys, subprocess, numpy as np, onnxruntime as ort, time
 src, out = sys.argv[1], sys.argv[2]
+# optional window (seconds): frames outside it are written fully transparent without running the model
+win=(float(sys.argv[3]),float(sys.argv[4])) if len(sys.argv)>4 else None
 W,H=1080,1920
+# write the matte at the source frame rate, otherwise it drifts against a 60/120-fps cut
+FPS=subprocess.check_output(["ffprobe","-v","error","-select_streams","v:0","-show_entries","stream=r_frame_rate","-of","csv=p=0",src]).decode().strip().strip(",")
+fpsf=eval(FPS)
 sess=ort.InferenceSession("/home/user/models/rvm/rvm_mobilenetv3_fp32.onnx", providers=["CPUExecutionProvider"])
 rec=[np.zeros([1,1,1,1],np.float32)]*4; ds=np.array([0.25],np.float32)
 rd=subprocess.Popen(["ffmpeg","-loglevel","error","-i",src,"-f","rawvideo","-pix_fmt","rgb24","-"],stdout=subprocess.PIPE)
-wr=subprocess.Popen(["ffmpeg","-loglevel","error","-y","-f","rawvideo","-pix_fmt","rgba","-s",f"{W}x{H}","-r","30","-i","-",
+wr=subprocess.Popen(["ffmpeg","-loglevel","error","-y","-f","rawvideo","-pix_fmt","rgba","-s",f"{W}x{H}","-r",FPS,"-i","-",
   "-c:v","libvpx-vp9","-pix_fmt","yuva420p","-b:v","0","-crf","28","-deadline","realtime","-cpu-used","8","-row-mt","1","-auto-alt-ref","0",out],stdin=subprocess.PIPE)
 n=0; t0=time.time()
 while True:
     buf=rd.stdout.read(W*H*3)
     if len(buf)<W*H*3: break
     fr=np.frombuffer(buf,np.uint8).reshape(H,W,3)
+    if win and not (win[0] <= n/fpsf <= win[1]):
+        wr.stdin.write(np.dstack([fr,np.zeros((H,W),np.uint8)]).tobytes()); n+=1; continue
     x=(fr.astype(np.float32)/255).transpose(2,0,1)[None]
     fgr,pha,*rec=sess.run(None,{"src":x,"r1i":rec[0],"r2i":rec[1],"r3i":rec[2],"r4i":rec[3],"downsample_ratio":ds})
     a=(np.clip(pha[0,0],0,1)*255).astype(np.uint8)
