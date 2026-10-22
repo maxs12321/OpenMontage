@@ -1,0 +1,600 @@
+{
+ "videoSrc": "jirafik/v5-cut60.mp4",
+ "videoDuration": 28.498,
+ "cuts": [
+  0.9,
+  1.667,
+  2.734,
+  10.144,
+  17.311,
+  22.078
+ ],
+ "whooshAt": [],
+ "emphasis": [],
+ "words": [
+  {
+   "text": "Многие",
+   "start": 2.884,
+   "end": 3.204
+  },
+  {
+   "text": "заходят",
+   "start": 3.204,
+   "end": 3.604
+  },
+  {
+   "text": "в",
+   "start": 3.604,
+   "end": 3.644
+  },
+  {
+   "text": "РКО",
+   "start": 3.644,
+   "end": 4.044,
+   "key": true
+  },
+  {
+   "text": "так:",
+   "start": 4.044,
+   "end": 4.244
+  },
+  {
+   "text": "берут",
+   "start": 4.244,
+   "end": 4.524
+  },
+  {
+   "text": "реферальную",
+   "start": 4.524,
+   "end": 5.044,
+   "key": true
+  },
+  {
+   "text": "ссылку",
+   "start": 5.044,
+   "end": 5.364
+  },
+  {
+   "text": "с",
+   "start": 5.364,
+   "end": 5.484
+  },
+  {
+   "text": "приложения",
+   "start": 5.484,
+   "end": 5.924
+  },
+  {
+   "text": "банка,",
+   "start": 5.924,
+   "end": 6.244
+  },
+  {
+   "text": "кидают",
+   "start": 6.244,
+   "end": 6.684
+  },
+  {
+   "text": "её",
+   "start": 6.684,
+   "end": 6.844
+  },
+  {
+   "text": "друзьям,",
+   "start": 6.844,
+   "end": 7.324
+  },
+  {
+   "text": "по",
+   "start": 7.324,
+   "end": 7.484
+  },
+  {
+   "text": "итогу",
+   "start": 7.484,
+   "end": 7.804
+  },
+  {
+   "text": "получают",
+   "start": 7.804,
+   "end": 8.244
+  },
+  {
+   "text": "копейки",
+   "start": 8.244,
+   "end": 8.684,
+   "key": true
+  },
+  {
+   "text": "и",
+   "start": 8.684,
+   "end": 8.844
+  },
+  {
+   "text": "срезы",
+   "start": 8.844,
+   "end": 9.364
+  },
+  {
+   "text": "по",
+   "start": 9.364,
+   "end": 9.484
+  },
+  {
+   "text": "заявкам.",
+   "start": 9.484,
+   "end": 9.984
+  },
+  {
+   "text": "Настоящая",
+   "start": 10.214,
+   "end": 10.734
+  },
+  {
+   "text": "ниша",
+   "start": 10.734,
+   "end": 11.094
+  },
+  {
+   "text": "работа",
+   "start": 11.094,
+   "end": 11.454
+  },
+  {
+   "text": "через",
+   "start": 11.454,
+   "end": 11.654
+  },
+  {
+   "text": "партнёрские",
+   "start": 11.654,
+   "end": 12.254,
+   "key": true
+  },
+  {
+   "text": "сети:",
+   "start": 12.254,
+   "end": 12.574
+  },
+  {
+   "text": "это",
+   "start": 12.574,
+   "end": 12.814
+  },
+  {
+   "text": "площадки,",
+   "start": 12.814,
+   "end": 13.334
+  },
+  {
+   "text": "где",
+   "start": 13.334,
+   "end": 13.494
+  },
+  {
+   "text": "собраны",
+   "start": 13.494,
+   "end": 13.934
+  },
+  {
+   "text": "офферы",
+   "start": 13.934,
+   "end": 14.374,
+   "key": true
+  },
+  {
+   "text": "десятков",
+   "start": 14.374,
+   "end": 14.814
+  },
+  {
+   "text": "банков",
+   "start": 14.814,
+   "end": 15.254
+  },
+  {
+   "text": "сразу,",
+   "start": 15.254,
+   "end": 15.534
+  },
+  {
+   "text": "с",
+   "start": 15.534,
+   "end": 15.694
+  },
+  {
+   "text": "отдельными",
+   "start": 15.694,
+   "end": 16.174
+  },
+  {
+   "text": "ставками",
+   "start": 16.174,
+   "end": 16.614,
+   "key": true
+  },
+  {
+   "text": "за",
+   "start": 16.614,
+   "end": 16.734
+  },
+  {
+   "text": "клиента.",
+   "start": 16.734,
+   "end": 17.234
+  },
+  {
+   "text": "Одна",
+   "start": 17.481,
+   "end": 17.681
+  },
+  {
+   "text": "и",
+   "start": 17.681,
+   "end": 17.801
+  },
+  {
+   "text": "та",
+   "start": 17.801,
+   "end": 17.961
+  },
+  {
+   "text": "же",
+   "start": 17.961,
+   "end": 18.081
+  },
+  {
+   "text": "заявка",
+   "start": 18.081,
+   "end": 18.441
+  },
+  {
+   "text": "может",
+   "start": 18.441,
+   "end": 18.641
+  },
+  {
+   "text": "принести",
+   "start": 18.641,
+   "end": 19.041
+  },
+  {
+   "text": "тебе",
+   "start": 19.041,
+   "end": 19.281
+  },
+  {
+   "text": "в",
+   "start": 19.281,
+   "end": 19.401
+  },
+  {
+   "text": "разы",
+   "start": 19.401,
+   "end": 19.641
+  },
+  {
+   "text": "меньше,",
+   "start": 19.641,
+   "end": 20.041,
+   "key": true
+  },
+  {
+   "text": "просто",
+   "start": 20.041,
+   "end": 20.361
+  },
+  {
+   "text": "потому",
+   "start": 20.361,
+   "end": 20.681
+  },
+  {
+   "text": "что",
+   "start": 20.681,
+   "end": 20.801
+  },
+  {
+   "text": "ты",
+   "start": 20.801,
+   "end": 20.921
+  },
+  {
+   "text": "отправил",
+   "start": 20.921,
+   "end": 21.361
+  },
+  {
+   "text": "её",
+   "start": 21.361,
+   "end": 21.561
+  },
+  {
+   "text": "не",
+   "start": 21.561,
+   "end": 21.721
+  },
+  {
+   "text": "туда.",
+   "start": 21.721,
+   "end": 22.221,
+   "key": true
+  },
+  {
+   "text": "Какие",
+   "start": 22.178,
+   "end": 22.378
+  },
+  {
+   "text": "партнёрские",
+   "start": 22.378,
+   "end": 22.938
+  },
+  {
+   "text": "сети",
+   "start": 22.938,
+   "end": 23.218
+  },
+  {
+   "text": "мы",
+   "start": 23.218,
+   "end": 23.378
+  },
+  {
+   "text": "используем",
+   "start": 23.378,
+   "end": 23.858
+  },
+  {
+   "text": "и",
+   "start": 23.858,
+   "end": 23.978
+  },
+  {
+   "text": "как",
+   "start": 23.978,
+   "end": 24.138
+  },
+  {
+   "text": "ими",
+   "start": 24.138,
+   "end": 24.338
+  },
+  {
+   "text": "правильно",
+   "start": 24.338,
+   "end": 24.658
+  },
+  {
+   "text": "пользоваться",
+   "start": 24.658,
+   "end": 25.098
+  },
+  {
+   "text": "рассказываю",
+   "start": 25.098,
+   "end": 25.498
+  },
+  {
+   "text": "в",
+   "start": 25.498,
+   "end": 25.578
+  },
+  {
+   "text": "своём",
+   "start": 25.578,
+   "end": 25.778
+  },
+  {
+   "text": "бесплатном",
+   "start": 25.778,
+   "end": 26.218,
+   "key": true
+  },
+  {
+   "text": "обучении.",
+   "start": 26.218,
+   "end": 26.698
+  },
+  {
+   "text": "Поэтому",
+   "start": 26.698,
+   "end": 27.018
+  },
+  {
+   "text": "жду",
+   "start": 27.018,
+   "end": 27.218
+  },
+  {
+   "text": "тебя",
+   "start": 27.218,
+   "end": 27.418
+  },
+  {
+   "text": "в",
+   "start": 27.418,
+   "end": 27.498
+  },
+  {
+   "text": "своём",
+   "start": 27.498,
+   "end": 27.778
+  },
+  {
+   "text": "Telegram-",
+   "start": 27.778,
+   "end": 28.178,
+   "key": true
+  },
+  {
+   "text": "канале.",
+   "start": 28.178,
+   "end": 28.678
+  }
+ ],
+ "stickers": [],
+ "inserts": [],
+ "cta": {
+  "start": 26.698,
+  "end": 28.498,
+  "label": "Партнёрки и связки — в бесплатном обучении",
+  "handle": "@jirafiktrafik"
+ },
+ "compare": {
+  "start": 17.311,
+  "end": 22.078,
+  "items": [
+   {
+    "at": 17.431,
+    "label": "Реф-ссылка в приложении Альфы",
+    "src": "jirafik/v5-bank-ref.jpg",
+    "value": "5 000 баллов"
+   },
+   {
+    "at": 19.301,
+    "label": "Партнёрская сеть · Альфа-Банк",
+    "src": "jirafik/v5-partner-alfa.jpg",
+    "value": "14 000 ₽",
+    "count": 14000,
+    "suffix": " ₽",
+    "good": true
+   }
+  ],
+  "crossAt": 21.561
+ },
+ "hook": {
+  "tag": "",
+  "line1": "Реферальная ссылка банка",
+  "line2": "vs партнёрская сеть",
+  "until": 2.734,
+  "teaser": "",
+  "size": 96,
+  "line2At": 1.36
+ },
+ "hookStyle": "lower",
+ "captionStyle": "word",
+ "captionsFrom": 2.734,
+ "sfx": [
+  {
+   "at": 0.0,
+   "src": "jirafik/sfx2-appear.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 2.614,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 4.474,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.35
+  },
+  {
+   "at": 10.024,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 17.111,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 19.431,
+   "src": "jirafik/sfx2-gauge.wav",
+   "volume": 0.35
+  },
+  {
+   "at": 21.561,
+   "src": "jirafik/sfx3-mouse-click.wav",
+   "volume": 0.5
+  },
+  {
+   "at": 21.958,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 26.698,
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
+  }
+ ],
+ "endCard": {
+  "seconds": 0,
+  "question": "",
+  "handles": []
+ },
+ "motion": {
+  "push": 0.015,
+  "jumpZoom": 0.12,
+  "jumpRanges": [
+   [
+    6.439,
+    10.144,
+    0.18,
+    44.2,
+    38.2
+   ],
+   [
+    25.288,
+    28.498,
+    0.18,
+    44.1,
+    39.4
+   ]
+  ],
+  "alternate": false,
+  "punch": 0,
+  "blur": 0,
+  "flash": false,
+  "emphasisZoom": 0.05,
+  "vignette": false
+ },
+ "transitions": [
+  {
+   "at": 2.734,
+   "type": "whip",
+   "dir": 1
+  },
+  {
+   "at": 10.144,
+   "type": "whip",
+   "dir": -1
+  },
+  {
+   "at": 17.311,
+   "type": "zoomin",
+   "dir": 1
+  },
+  {
+   "at": 22.078,
+   "type": "whip",
+   "dir": -1
+  }
+ ],
+ "plateTheme": "light",
+ "showProgress": false,
+ "personSrc": "jirafik/v5-person60.webm",
+ "bigWords": [
+  {
+   "start": 4.474,
+   "end": 5.924,
+   "lines": [
+    "РЕФ-",
+    "ССЫЛКА"
+   ],
+   "size": 165,
+   "top": 403,
+   "align": "center",
+   "font": {
+    "family": "'Russo One', sans-serif",
+    "weight": 400,
+    "lineHeight": 0.95
+   }
+  }
+ ],
+ "fps": 60
+}
