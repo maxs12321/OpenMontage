@@ -75,6 +75,8 @@ export type JirafikVlogProps = {
     line2: string;
     until: number;
     teaser?: string;
+    size?: number; // font size of the two lines (default 132)
+    line2At?: number; // seconds: second line appears when it is said
     // optional result flash before the title: shows the payoff first
     flash?: { value: string; label: string; until: number };
   };
@@ -106,6 +108,14 @@ export type JirafikVlogProps = {
   plateTheme?: "light" | "dark";
   // Transitions on shot changes (Ilya's tutorial), each with its own sound in sfx:
   // whip→swipe, zoomin→zoom (Fuwa), flash→camera shutter (stretch/click/glitch kept as extras). Never "tetris".
+  // Side-by-side money comparison drawn over a blurred shot (same client, two ways to send it)
+  compare?: {
+    start: number;
+    end: number;
+    title?: string;
+    items: { at: number; label: string; src?: string; value: string; count?: number; suffix?: string; good?: boolean }[];
+    crossAt?: number; // the weaker option gets crossed out
+  };
   transitions?: { at: number; type: "whip" | "zoomin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
@@ -397,7 +407,7 @@ const HookLower: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const l1 = spring({ frame, fps, config: { damping: 18, stiffness: 140 } });
-  const l2 = spring({ frame: frame - 5, fps, config: { damping: 18, stiffness: 140 } });
+  const l2 = spring({ frame: frame - (hook.line2At !== undefined ? Math.round(hook.line2At * fps) : 5), fps, config: { damping: 18, stiffness: 140 } });
   const kick = spring({ frame: frame - 10, fps, config: { damping: 20, stiffness: 120 } });
   const total = hook.until * fps;
   const out = interpolate(frame, [total - 10, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -405,7 +415,7 @@ const HookLower: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
   const line = (v: number): React.CSSProperties => ({
     fontFamily: TITLE,
     fontWeight: 700,
-    fontSize: 132,
+    fontSize: hook.size ?? 132,
     lineHeight: 0.98,
     textTransform: "uppercase",
     textShadow: shadow,
@@ -511,6 +521,48 @@ const TransitionFx: React.FC<{ list: NonNullable<JirafikVlogProps["transitions"]
         return null;
       })}
     </>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Compare: two light cards, the better offer counts up, the weaker gets crossed
+// ---------------------------------------------------------------------------
+const Compare: React.FC<{ c: NonNullable<JirafikVlogProps["compare"]> }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = c.start + frame / fps;
+  const total = (c.end - c.start) * fps;
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cross = c.crossAt !== undefined ? spring({ frame: Math.round((t - c.crossAt) * fps), fps, config: { damping: 16, stiffness: 200 } }) : 0;
+  return (
+    <AbsoluteFill style={{ opacity: out, alignItems: "center", paddingTop: 150 }}>
+      {c.title && (
+        <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 44, color: NAVY, background: "rgba(255,255,255,0.9)", padding: "8px 26px", borderRadius: 14, marginBottom: 26 }}>
+          {c.title}
+        </div>
+      )}
+      {c.items.map((it, i) => {
+        const f = Math.round((t - it.at) * fps);
+        const inn = spring({ frame: f, fps, config: { damping: 18, stiffness: 190, overshootClamping: true } });
+        if (f < 0) return <div key={i} style={{ height: 0 }} />;
+        const prog = interpolate(f, [4, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+        const val = it.count !== undefined ? Math.round(it.count * (1 - Math.pow(1 - prog, 3))).toLocaleString("ru-RU").replace(/\u00a0/g, " ") + (it.suffix ?? "") : it.value;
+        const crossed = !it.good && c.crossAt !== undefined;
+        return (
+          <div key={i} style={{ position: "relative", width: 900, marginBottom: 30, transform: `translateY(${(1 - inn) * 900}px)`,
+            background: "#fff", borderRadius: 30, padding: "26px 34px 30px", boxShadow: "0 18px 50px rgba(20,24,58,0.25)",
+            border: it.good ? `6px solid ${ORANGE}` : "6px solid transparent", opacity: crossed ? 1 - 0.45 * cross : 1 }}>
+            <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 36, color: "#2E4F8F", marginBottom: 14 }}>{it.label}</div>
+            {it.src && <Img src={staticFile(it.src)} style={{ width: "100%", height: 250, objectFit: "contain", background: "#F5F5F7", borderRadius: 18, display: "block", marginBottom: 14 }} />}
+            <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 92, lineHeight: 1, color: it.good ? ORANGE : NAVY }}>{val}</div>
+            {crossed && cross > 0.01 && (
+              <div style={{ position: "absolute", left: 20, right: 20, top: "50%", height: 14, borderRadius: 7, background: "#E5484D",
+                transform: `rotate(-8deg) scaleX(${cross})`, transformOrigin: "0 50%", boxShadow: "0 4px 12px rgba(229,72,77,0.4)" }} />
+            )}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
   );
 };
 
@@ -1111,6 +1163,11 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
       <Sequence durationInFrames={vf}>
         <MovingVideo {...p} />
         {p.transitions && <TransitionFx list={p.transitions} src={p.videoSrc} />}
+        {p.compare && (
+          <Sequence from={f(p.compare.start)} durationInFrames={f(p.compare.end - p.compare.start)}>
+            <Compare c={p.compare} />
+          </Sequence>
+        )}
         {p.stickers.map((s, i) => (
           <Sequence key={`st${i}`} from={f(s.start)} durationInFrames={f(s.duration)}>
             <Sticker s={s} index={i} />
