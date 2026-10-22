@@ -10,10 +10,19 @@ import {
   interpolate,
   spring,
   staticFile,
-  useCurrentFrame,
-  useVideoConfig,
+  useCurrentFrame as useRealFrame,
+  useVideoConfig as useRealConfig,
 } from "remotion";
 import { resolveAsset } from "./lib/resolveAsset";
+
+// Animations are tuned in 30 fps frames. At a higher render fps (props.fps, e.g. 60) the hooks
+// below hand components a fractional 30-fps frame, so every animation keeps its timing and just
+// gets more in-between frames. Sequence/Freeze positions use the real fps (realFps).
+const useCurrentFrame = () => useRealFrame() * (30 / useRealConfig().fps);
+const useVideoConfig = () => {
+  const c = useRealConfig();
+  return { ...c, fps: 30, realFps: c.fps };
+};
 
 // Brand-styled vlog edit for "Жирафик Трафик" (styles/jirafik-trafik.yaml).
 // Takes an already cut voice-led video and adds the motion layer: per-shot
@@ -69,6 +78,7 @@ export type JirafikVlogProps = {
   emphasis: { start: number; end: number }[];
   words: VlogWord[];
   stickers: VlogSticker[];
+  fps?: number; // render fps (default 30); 60 for smooth 120-fps sources
   hook: {
     tag: string;
     line1: string;
@@ -150,7 +160,8 @@ const DEFAULT_MOTION = {
 export const calculateJirafikVlogMetadata: CalculateMetadataFunction<
   JirafikVlogProps
 > = ({ props }) => ({
-  durationInFrames: Math.ceil((props.videoDuration + props.endCard.seconds) * 30),
+  fps: props.fps ?? 30,
+  durationInFrames: Math.ceil((props.videoDuration + props.endCard.seconds) * (props.fps ?? 30)),
 });
 
 const easeOut = (x: number) => 1 - Math.pow(1 - Math.min(Math.max(x, 0), 1), 3);
@@ -208,7 +219,7 @@ const BigWord: React.FC<{ w: NonNullable<JirafikVlogProps["bigWords"]>[number] }
 
 const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, realFps } = useVideoConfig();
   const t = frame / fps;
   const bounds = [0, ...p.cuts, p.videoDuration];
   let i = 0;
@@ -273,7 +284,7 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   // whip pan: outgoing and incoming shots slide together; the other shot is a frozen frame
   const mainX = whip ? (whip.before ? -whip.dir * whip.x * W : whip.dir * (1 - whip.x) * W) : 0;
   const otherX = whip ? (whip.before ? whip.dir * (1 - whip.x) * W : -whip.dir * whip.x * W) : 0;
-  const otherFrame = whip ? (whip.before ? Math.round(whip.at * fps) + 1 : Math.round(whip.at * fps) - 1) : 0;
+  const otherFrame = whip ? (whip.before ? Math.round(whip.at * realFps) + 1 : Math.round(whip.at * realFps) - 1) : 0;
   const isoBlur = Math.max(blur, tBlur);
   const filters = [
     isoBlur > 0.2 ? `blur(${isoBlur}px)` : "",
@@ -302,8 +313,8 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
         />
         {p.personSrc &&
           (p.bigWords ?? []).map((w, i) => {
-            const from = Math.round(w.start * fps);
-            const dur = Math.round((w.end - w.start) * fps);
+            const from = Math.round(w.start * realFps);
+            const dur = Math.round((w.end - w.start) * realFps);
             return (
               <Sequence key={`bw${i}`} from={from} durationInFrames={dur}>
                 <BigWord w={w} />
@@ -1155,7 +1166,7 @@ const EndCard: React.FC<{ card: JirafikVlogProps["endCard"] }> = ({ card }) => {
 
 // ---------------------------------------------------------------------------
 export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
-  const { fps } = useVideoConfig();
+  const { realFps: fps } = useVideoConfig();
   const vf = Math.round(p.videoDuration * fps);
   const f = (s: number) => Math.round(s * fps);
   return (
