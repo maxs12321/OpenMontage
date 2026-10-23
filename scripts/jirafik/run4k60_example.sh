@@ -24,7 +24,7 @@ json.dump(d,open(p+"jirafik-ref5-4k60.json","w"),ensure_ascii=False,indent=1)
 PYEOF
 echo "[5] render $(date +%T)"
 cd /home/user/OpenMontage/remotion-composer
-npx remotion render JirafikVlog /home/user/OpenMontage/projects/vid5/b4/render.mp4 --props=public/demo-props/jirafik-ref5-4k60.json --scale=2 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell --crf=14 --concurrency=4 --log=error 2>&1 | grep -vi "webpack\|npm" | tail -3
+npx remotion render JirafikVlog /home/user/OpenMontage/projects/vid5/b4/render.mp4 --props=public/demo-props/jirafik-ref5-4k60.json --scale=2 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell --crf=12 --image-format=png --concurrency=4 --log=error 2>&1 | grep -vi "webpack\|npm" | tail -3
 cd /home/user/OpenMontage/projects/vid5
 echo "[6] encode $(date +%T)"
 D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 b4/render.mp4); S=$(python3 -c "print($D-0.5)")
