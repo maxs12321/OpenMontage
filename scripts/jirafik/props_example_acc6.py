@@ -1,7 +1,7 @@
 import json, subprocess
 from PIL import ImageFont
-d=json.load(open("timeline.json")); W=d["words"]; C=d["cuts"]   # A|B, B|C, C|D
-B0,C0,D0=C
+d=json.load(open("timeline.json")); W=d["words"]; C=d["cuts"]   # P|A, A|B, B|C, C|D
+A0,B0,C0,D0=C
 def at(txt,n=1):
     c=0
     for w in W:
@@ -24,12 +24,12 @@ accounts={"start":B0,"end":C0,"cards":[{"title":"Банк №1","sub":"осно�
             {"at":at("техработы")["start"],"card":0,"text":"Техработы","tone":"warn"},
             {"at":at("бизнес")["start"],"card":1,"text":"Бизнес работает","tone":"good","anim":"scale"}],
   "shield":{"at":at("страховка")["start"],"card":1,"text":"Страховка"}}
-notes=[{"start":at("несколько")["start"],"end":D0,"text":"1 клиент → 4 заявки в разные банки","top":250}]
+notes=[{"start":at("несколько",2)["start"],"end":D0,"text":"1 клиент → 4 заявки в разные банки","top":250}]
 cta={"start":at("Ищи")["start"],"end":vd,"label":"Связки и порядок заявок — в бесплатном обучении","handle":"@jirafiktrafik"}
 J="jirafik/"; S=[]
 def add(t,src,vol): S.append({"at":round(t,3),"src":J+src,"volume":vol})
 add(0.0,"sfx2-appear.wav",0.4)                                   # title
-TR=[(B0,"zoomin"),(C0,"whip"),(D0,"whip")]
+TR=[(A0,"whip"),(B0,"zoomin"),(C0,"whip"),(D0,"whip")]
 TS={"whip":("sfx2-swipe.wav",0.55,-0.12),"zoomin":("sfx2-zoom.wav",0.4,-0.2)}
 for t_,ty in TR: src,vol,o=TS[ty]; add(t_+o,src,vol)
 add(accounts["badges"][0]["at"],"sfx2-charge.wav",0.45)          # «заблокированы» flickers
@@ -50,8 +50,8 @@ for r,mm in zip(jr,mids):
     r+=[44.0,40.0] if h["headTop"]>=1900 else [round(100*(h["headTop"]+170)/1920,1),round(100*h["cx"]/1080,1)]
 props={"videoSrc":"jirafik/v6-cut.mp4","videoDuration":vd,"fps":60,"cuts":C,"whooshAt":[],"emphasis":[],
  "words":W,"stickers":[],"inserts":[],"cta":cta,"accounts":accounts,"notes":notes,
- "hook":{"tag":"","line1":"Не один счёт","line2":"а два-три","until":B0,"teaser":"зачем бизнесу запасной счёт","size":120,"line2At":at("два")["start"]-0.05},
- "hookStyle":"lower","captionStyle":"word","captionsFrom":B0,"sfx":S,
+ "hook":{"tag":"","line1":"Один клиент —","line2":"несколько банков","until":A0,"teaser":"","size":118,"line2At":at("несколько")["start"]-0.05},
+ "hookStyle":"lower","captionStyle":"word","captionsFrom":A0,"sfx":S,
  "endCard":{"seconds":0,"question":"","handles":[]},
  "motion":{"push":0.015,"jumpZoom":0.12,"jumpRanges":jr,"alternate":False,"punch":0,"blur":0,"flash":False,"emphasisZoom":0.05,"vignette":False},
  "transitions":transitions,"plateTheme":"light","showProgress":False,"personSrc":"jirafik/v6-person.webm","bigWords":big}
