@@ -1,0 +1,532 @@
+{
+ "videoSrc": "jirafik/v6-cut.mp4",
+ "videoDuration": 21.769,
+ "fps": 60,
+ "cuts": [
+  4.35,
+  11.437,
+  15.825
+ ],
+ "whooshAt": [],
+ "emphasis": [],
+ "words": [
+  {
+   "text": "Знаешь,",
+   "start": 0.19,
+   "end": 0.47
+  },
+  {
+   "text": "почему",
+   "start": 0.47,
+   "end": 0.79
+  },
+  {
+   "text": "опытные",
+   "start": 0.79,
+   "end": 1.19
+  },
+  {
+   "text": "предприниматели",
+   "start": 1.19,
+   "end": 1.87
+  },
+  {
+   "text": "используют",
+   "start": 1.87,
+   "end": 2.31
+  },
+  {
+   "text": "не",
+   "start": 2.31,
+   "end": 2.43
+  },
+  {
+   "text": "один",
+   "start": 2.43,
+   "end": 2.67
+  },
+  {
+   "text": "счёт",
+   "start": 2.67,
+   "end": 2.95
+  },
+  {
+   "text": "в",
+   "start": 2.95,
+   "end": 3.07
+  },
+  {
+   "text": "банке,",
+   "start": 3.07,
+   "end": 3.43
+  },
+  {
+   "text": "а",
+   "start": 3.43,
+   "end": 3.59
+  },
+  {
+   "text": "два-",
+   "start": 3.59,
+   "end": 3.83
+  },
+  {
+   "text": "три?",
+   "start": 3.83,
+   "end": 4.33
+  },
+  {
+   "text": "Если",
+   "start": 4.45,
+   "end": 4.65
+  },
+  {
+   "text": "один",
+   "start": 4.65,
+   "end": 4.89
+  },
+  {
+   "text": "банк",
+   "start": 4.89,
+   "end": 5.13
+  },
+  {
+   "text": "заблокирует",
+   "start": 5.13,
+   "end": 5.63,
+   "key": true
+  },
+  {
+   "text": "операции",
+   "start": 5.827,
+   "end": 6.227
+  },
+  {
+   "text": "или",
+   "start": 6.227,
+   "end": 6.307
+  },
+  {
+   "text": "уйдёт",
+   "start": 6.307,
+   "end": 6.587
+  },
+  {
+   "text": "на",
+   "start": 6.587,
+   "end": 6.707
+  },
+  {
+   "text": "техработы,",
+   "start": 6.707,
+   "end": 7.307,
+   "key": true
+  },
+  {
+   "text": "бизнес",
+   "start": 7.307,
+   "end": 7.667
+  },
+  {
+   "text": "не",
+   "start": 7.667,
+   "end": 7.787
+  },
+  {
+   "text": "встанет.",
+   "start": 7.787,
+   "end": 8.227
+  },
+  {
+   "text": "Запасной",
+   "start": 8.227,
+   "end": 8.747
+  },
+  {
+   "text": "счёт",
+   "start": 8.747,
+   "end": 9.027
+  },
+  {
+   "text": "это",
+   "start": 9.027,
+   "end": 9.267
+  },
+  {
+   "text": "просто",
+   "start": 9.267,
+   "end": 9.587
+  },
+  {
+   "text": "страховка.",
+   "start": 9.587,
+   "end": 10.187,
+   "key": true
+  },
+  {
+   "text": "А",
+   "start": 10.187,
+   "end": 10.427
+  },
+  {
+   "text": "для",
+   "start": 10.427,
+   "end": 10.587
+  },
+  {
+   "text": "тебя",
+   "start": 10.587,
+   "end": 10.867
+  },
+  {
+   "text": "это",
+   "start": 10.867,
+   "end": 11.067
+  },
+  {
+   "text": "значит:",
+   "start": 11.067,
+   "end": 11.567
+  },
+  {
+   "text": "клиент",
+   "start": 11.477,
+   "end": 11.797
+  },
+  {
+   "text": "может",
+   "start": 11.797,
+   "end": 12.037
+  },
+  {
+   "text": "принести",
+   "start": 12.037,
+   "end": 12.477
+  },
+  {
+   "text": "не",
+   "start": 12.477,
+   "end": 12.597
+  },
+  {
+   "text": "одну",
+   "start": 12.597,
+   "end": 12.837
+  },
+  {
+   "text": "выплату,",
+   "start": 12.837,
+   "end": 13.317
+  },
+  {
+   "text": "а",
+   "start": 13.317,
+   "end": 13.477
+  },
+  {
+   "text": "несколько,",
+   "start": 13.477,
+   "end": 14.117,
+   "key": true
+  },
+  {
+   "text": "если",
+   "start": 14.117,
+   "end": 14.557
+  },
+  {
+   "text": "ему",
+   "start": 14.557,
+   "end": 14.757
+  },
+  {
+   "text": "это",
+   "start": 14.757,
+   "end": 14.917
+  },
+  {
+   "text": "действительно",
+   "start": 14.917,
+   "end": 15.437
+  },
+  {
+   "text": "нужно.",
+   "start": 15.437,
+   "end": 15.937
+  },
+  {
+   "text": "Какие",
+   "start": 15.945,
+   "end": 16.185
+  },
+  {
+   "text": "банки",
+   "start": 16.185,
+   "end": 16.545,
+   "key": true
+  },
+  {
+   "text": "сочетать",
+   "start": 16.545,
+   "end": 17.025
+  },
+  {
+   "text": "и",
+   "start": 17.025,
+   "end": 17.145
+  },
+  {
+   "text": "в",
+   "start": 17.145,
+   "end": 17.225
+  },
+  {
+   "text": "каком",
+   "start": 17.225,
+   "end": 17.465
+  },
+  {
+   "text": "порядке",
+   "start": 17.465,
+   "end": 17.825
+  },
+  {
+   "text": "подавать",
+   "start": 17.825,
+   "end": 18.185
+  },
+  {
+   "text": "заявки,",
+   "start": 18.185,
+   "end": 18.545
+  },
+  {
+   "text": "рассказываю",
+   "start": 18.545,
+   "end": 19.025
+  },
+  {
+   "text": "в",
+   "start": 19.025,
+   "end": 19.025
+  },
+  {
+   "text": "своём",
+   "start": 19.025,
+   "end": 19.305
+  },
+  {
+   "text": "бесплатном",
+   "start": 19.305,
+   "end": 19.825,
+   "key": true
+  },
+  {
+   "text": "обучении.",
+   "start": 19.825,
+   "end": 20.425
+  },
+  {
+   "text": "Ищи",
+   "start": 20.425,
+   "end": 20.785
+  },
+  {
+   "text": "Telegram",
+   "start": 20.785,
+   "end": 21.265,
+   "key": true
+  },
+  {
+   "text": "в",
+   "start": 21.265,
+   "end": 21.345
+  },
+  {
+   "text": "профиле.",
+   "start": 21.345,
+   "end": 21.845
+  }
+ ],
+ "stickers": [],
+ "inserts": [],
+ "cta": {
+  "start": 20.425,
+  "end": 21.769,
+  "label": "Связки и порядок заявок — в бесплатном обучении",
+  "handle": "@jirafiktrafik"
+ },
+ "accounts": {
+  "start": 4.35,
+  "end": 11.437,
+  "cards": [
+   {
+    "title": "Банк №1",
+    "sub": "основной счёт",
+    "at": 4.3999999999999995
+   },
+   {
+    "title": "Банк №2",
+    "sub": "запасной счёт",
+    "at": 6.177
+   }
+  ],
+  "badges": [
+   {
+    "at": 5.827,
+    "card": 0,
+    "text": "Операции заблокированы",
+    "tone": "bad",
+    "anim": "flicker"
+   },
+   {
+    "at": 6.707,
+    "card": 0,
+    "text": "Техработы",
+    "tone": "warn"
+   },
+   {
+    "at": 7.307,
+    "card": 1,
+    "text": "Бизнес работает",
+    "tone": "good",
+    "anim": "scale"
+   }
+  ],
+  "shield": {
+   "at": 9.587,
+   "card": 1,
+   "text": "Страховка"
+  }
+ },
+ "notes": [
+  {
+   "start": 13.477,
+   "end": 15.825,
+   "text": "1 клиент → 4 заявки в разные банки",
+   "top": 250
+  }
+ ],
+ "hook": {
+  "tag": "",
+  "line1": "Не один счёт",
+  "line2": "а два-три",
+  "until": 4.35,
+  "teaser": "зачем бизнесу запасной счёт",
+  "size": 120,
+  "line2At": 3.54
+ },
+ "hookStyle": "lower",
+ "captionStyle": "word",
+ "captionsFrom": 4.35,
+ "sfx": [
+  {
+   "at": 0.0,
+   "src": "jirafik/sfx2-appear.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 4.15,
+   "src": "jirafik/sfx2-zoom.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 5.827,
+   "src": "jirafik/sfx2-charge.wav",
+   "volume": 0.45
+  },
+  {
+   "at": 9.587,
+   "src": "jirafik/sfx2-appear.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 11.317,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 13.477,
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
+  },
+  {
+   "at": 15.705,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.55
+  },
+  {
+   "at": 20.425,
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.4
+  }
+ ],
+ "endCard": {
+  "seconds": 0,
+  "question": "",
+  "handles": []
+ },
+ "motion": {
+  "push": 0.015,
+  "jumpZoom": 0.12,
+  "jumpRanges": [
+   [
+    2.25,
+    4.35,
+    0.18,
+    45.3,
+    50.0
+   ],
+   [
+    18.465,
+    21.769,
+    0.18,
+    45.3,
+    50.0
+   ]
+  ],
+  "alternate": false,
+  "punch": 0,
+  "blur": 0,
+  "flash": false,
+  "emphasisZoom": 0.05,
+  "vignette": false
+ },
+ "transitions": [
+  {
+   "at": 4.35,
+   "type": "zoomin",
+   "dir": 1
+  },
+  {
+   "at": 11.437,
+   "type": "whip",
+   "dir": -1
+  },
+  {
+   "at": 15.825,
+   "type": "whip",
+   "dir": 1
+  }
+ ],
+ "plateTheme": "light",
+ "showProgress": false,
+ "personSrc": "jirafik/v6-person.webm",
+ "bigWords": [
+  {
+   "start": 16.135,
+   "end": 17.465,
+   "lines": [
+    "БАНКИ"
+   ],
+   "size": 205,
+   "top": 260,
+   "align": "center",
+   "font": {
+    "family": "'Russo One', sans-serif",
+    "weight": 400,
+    "lineHeight": 0.95
+   }
+  }
+ ]
+}

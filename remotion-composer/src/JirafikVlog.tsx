@@ -126,6 +126,16 @@ export type JirafikVlogProps = {
     items: { at: number; label: string; src?: string; value: string; count?: number; suffix?: string; good?: boolean }[];
     crossAt?: number; // the weaker option gets crossed out
   };
+  // Account cards scenario (e.g. main account blocked → backup keeps the business running)
+  accounts?: {
+    start: number;
+    end: number;
+    cards: { title: string; sub: string; at: number }[];
+    badges: { at: number; card: number; text: string; tone: "bad" | "warn" | "good"; anim?: "flicker" | "scale" }[];
+    shield?: { at: number; card: number; text: string };
+  };
+  // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
+  notes?: { start: number; end: number; text: string; top?: number }[];
   transitions?: { at: number; type: "whip" | "zoomin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
@@ -573,6 +583,76 @@ const Compare: React.FC<{ c: NonNullable<JirafikVlogProps["compare"]> }> = ({ c 
           </div>
         );
       })}
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Accounts: bank cards with status badges and an insurance shield
+// ---------------------------------------------------------------------------
+const TONE = { bad: "#E5484D", warn: "#8A8FA8", good: "#2EA043" } as const;
+const Accounts: React.FC<{ a: NonNullable<JirafikVlogProps["accounts"]> }> = ({ a }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = a.start + frame / fps;
+  const total = (a.end - a.start) * fps;
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ opacity: out, alignItems: "center", paddingTop: 300 }}>
+      {a.cards.map((c, i) => {
+        const inn = spring({ frame: (t - c.at) * fps, fps, config: { damping: 18, stiffness: 190, overshootClamping: true } });
+        const badges = a.badges.filter((b) => b.card === i && t >= b.at);
+        const bad = badges.some((b) => b.tone === "bad" || b.tone === "warn");
+        const good = badges.some((b) => b.tone === "good");
+        const sh = a.shield && a.shield.card === i ? spring({ frame: (t - a.shield.at) * fps, fps, config: { damping: 14, stiffness: 160 } }) : 0;
+        return (
+          <div key={i} style={{ position: "relative", width: 860, marginBottom: 40, transform: `translateY(${(1 - inn) * 700}px)`, opacity: Math.min(1, inn * 1.5),
+            background: "#fff", borderRadius: 30, padding: "30px 36px", boxShadow: "0 18px 50px rgba(20,24,58,0.25)",
+            border: `6px solid ${good ? ORANGE : "transparent"}`, filter: bad && !good ? "saturate(0.6)" : undefined }}>
+            <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 70, color: NAVY, lineHeight: 1 }}>{c.title}</div>
+            <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 34, color: "#2E4F8F", marginTop: 8 }}>{c.sub}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: badges.length ? 18 : 0 }}>
+              {badges.map((b, j) => {
+                const bf = Math.round((t - b.at) * fps);
+                const bs = spring({ frame: bf, fps, config: { damping: 13, stiffness: 240 } });
+                const flick = b.anim === "flicker" ? (bf >= 9 || [0, 1, 4, 5, 7].includes(bf) ? 1 : 0.15) : 1;
+                const sc = b.anim === "scale" ? 0.3 + 0.7 * bs : 1;
+                return (
+                  <div key={j} style={{ fontFamily: BODY, fontWeight: 800, fontSize: 36, color: "#fff", background: TONE[b.tone],
+                    borderRadius: 14, padding: "6px 18px", opacity: flick * Math.min(1, bs * 1.6), transform: `scale(${sc})`, transformOrigin: "left center" }}>
+                    {b.text}
+                  </div>
+                );
+              })}
+            </div>
+            {sh > 0.01 && (
+              <div style={{ position: "absolute", right: -26, top: -40, transform: `scale(${sh}) rotate(${(1 - sh) * -20}deg)`, filter: `blur(${(1 - Math.min(1, sh)) * 8}px)`,
+                display: "flex", alignItems: "center", gap: 10, background: NAVY, color: "#fff", borderRadius: 22, padding: "12px 22px",
+                fontFamily: BODY, fontWeight: 800, fontSize: 38, boxShadow: "0 12px 30px rgba(20,24,58,0.35)" }}>
+                <svg width="40" height="46" viewBox="0 0 40 46"><path d="M20 2 L37 9 V22 C37 33 29 41 20 44 C11 41 3 33 3 22 V9 Z" fill={ORANGE} />
+                  <path d="M12 23 L18 29 L29 17" stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                {a.shield!.text}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+const Note: React.FC<{ n: NonNullable<JirafikVlogProps["notes"]>[number] }> = ({ n }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const v = spring({ frame, fps, config: { damping: 14, stiffness: 260 } });
+  const total = (n.end - n.start) * fps;
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ alignItems: "center", top: n.top ?? 260, opacity: out }}>
+      <div style={{ transform: `scale(${0.3 + 0.7 * v})`, opacity: Math.min(1, v * 1.6), background: "#fff", color: NAVY, fontFamily: BODY, fontWeight: 800,
+        fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}` }}>
+        {n.text}
+      </div>
     </AbsoluteFill>
   );
 };
@@ -1174,6 +1254,16 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
       <Sequence durationInFrames={vf}>
         <MovingVideo {...p} />
         {p.transitions && <TransitionFx list={p.transitions} src={p.videoSrc} />}
+        {p.accounts && (
+          <Sequence from={f(p.accounts.start)} durationInFrames={f(p.accounts.end - p.accounts.start)}>
+            <Accounts a={p.accounts} />
+          </Sequence>
+        )}
+        {(p.notes ?? []).map((n, i) => (
+          <Sequence key={`nt${i}`} from={f(n.start)} durationInFrames={f(n.end - n.start)}>
+            <Note n={n} />
+          </Sequence>
+        ))}
         {p.compare && (
           <Sequence from={f(p.compare.start)} durationInFrames={f(p.compare.end - p.compare.start)}>
             <Compare c={p.compare} />
