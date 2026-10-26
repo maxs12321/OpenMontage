@@ -166,7 +166,7 @@ export type JirafikVlogProps = {
   };
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
-  transitions?: { at: number; type: "whip" | "zoomin" | "blurin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
+  transitions?: { at: number; type: "whip" | "zoomin" | "blurin" | "dissolve" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
   captionsFrom: number;
@@ -280,6 +280,7 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
   // transition around a cut: d = seconds from the cut
   let tScaleY = 1, tShift = 0, tBlur = 0, tZoom = 0, tBright = 1, mbX = 0;
   let whip: { x: number; dir: number; at: number; before: boolean } | null = null;
+  let dissolve: { k: number; at: number } | null = null;
   const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
   for (const tr of p.transitions ?? []) {
     const d = t - tr.at;
@@ -297,6 +298,8 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
       const k = d < 0 ? Math.pow((d + 0.5) / 0.5, 1.6) : 1 - d / 0.25;
       tBlur = d < 0 ? 30 * k : 6 * k; tZoom = 0.06 * k;
     }
+    // dissolve: the last frame of the outgoing shot fades out (softening) over the incoming one
+    if (tr.type === "dissolve" && d >= 0 && d < 0.6) dissolve = { k: 1 - ease(d / 0.6), at: tr.at };
     if (tr.type === "flash" && d > -0.1 && d < 0.3) {
       const k = d < 0 ? (d + 0.1) / 0.1 : Math.pow(1 - d / 0.3, 1.6);
       tBright = 1 + 0.9 * k; tZoom = 0.04 * k;
@@ -325,6 +328,17 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
     transform: `translateX(${x}px) translateY(${tShift}px) scale(${sc}, ${sc * tScaleY})`,
     transformOrigin: `${originX}% ${originY}%`,
   });
+  // scale/origin the previous shot had at a given moment (for the frozen dissolve layer)
+  const shotLook = (tt: number) => {
+    let j = 0;
+    while (j < bounds.length - 2 && tt >= bounds[j + 1]) j++;
+    const pr = Math.min((tt - bounds[j]) / Math.max(bounds[j + 1] - bounds[j], 0.1), 1);
+    const e = pr * pr * (3 - 2 * pr);
+    const r = m.jumpRanges ? m.jumpRanges.find(([a, b]) => tt >= a && tt < b) : undefined;
+    const jz = (m.jumpRanges ? !!r : j % 2 === 1) ? (r?.[2] ?? m.jumpZoom ?? 0) : 0;
+    const po = m.alternate && j % 2 === 1;
+    return { sc: (po ? 1.01 + m.push * (1 - e) : 1.01 + m.push * e) + jz, ox: r?.[4] ?? 50, oy: r?.[3] ?? 50 };
+  };
   const W = 1080;
   // whip pan: outgoing and incoming shots slide together; the other shot is a frozen frame
   const mainX = whip ? (whip.before ? -whip.dir * whip.x * W : whip.dir * (1 - whip.x) * W) : 0;
@@ -376,6 +390,17 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
             );
           })}
       </AbsoluteFill>
+      {dissolve && (() => {
+        const lk = shotLook(dissolve.at - 0.02);
+        const g = 1 - dissolve.k;
+        return (
+          <AbsoluteFill style={{ opacity: dissolve.k, filter: g > 0.02 ? `blur(${18 * g}px)` : undefined, transform: `scale(${lk.sc + 0.03 * g})`, transformOrigin: `${lk.ox}% ${lk.oy}%` }}>
+            <Freeze frame={Math.round(dissolve.at * realFps) - 1}>
+              <OffthreadVideo src={resolveAsset(p.videoSrc)} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </Freeze>
+          </AbsoluteFill>
+        );
+      })()}
       </AbsoluteFill>
       {/* soft vignette keeps text readable on bright shots */}
       {m.vignette && (

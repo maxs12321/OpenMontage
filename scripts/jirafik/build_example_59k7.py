@@ -1,7 +1,8 @@
 import json, subprocess
 g=[dict(w,word=w["word"].strip()) for w in json.load(open("b/full_g.json"))]
 wseg=[(s["start"],s["end"]) for s in json.load(open("b/full_w.json"))]
-DARK=[(7.383,19.75),(27.11,39.91),(52.775,68.19)]
+# exact first frames of each shot change (60 fps grid)
+DARK=[(443/60,1185/60),(1627/60,2395/60),(3167/60,4091/60)]
 END=78.86
 fix={0:"Банки",3:"59 000 ₽",4:"",5:"",6:"",9:"клиента.",10:"При",18:"копейки.",19:"Сейчас",23:"работает.",24:"Ниша",26:"РКО —",27:"расчётно-",29:"обслуживание.",30:"Если",31:"просто —",33:"счёт",35:"бизнеса.",36:"Банкам",39:"клиенты,",44:"привлечённого.",45:"Это",48:"бюджет.",49:"Вместо",55:"телевизору,",62:"человека.",63:"Я",65:"человека,",68:"счёт,",72:"комиссию.",73:"Клиенту",77:"стоит.",78:"А",82:"цифре.",83:"Он",85:"ИП",87:"НПД.",88:"Это",89:"упрощённый",95:"отчётности.",96:"Дальше",100:"счёт,",102:"несколько.",103:"И",106:"навязывание.",107:"Предприниматели",115:"банке,",119:"блокировки,",121:"работы,",123:"операций.",124:"2–3",125:"",126:"счёта —",128:"практика.",129:"И",132:"таблица:",133:"Альфа-Банк,",134:"",135:"ВТБ,",136:"Т-Банк,",137:"",138:"ПСБ,",139:"Сбербанк,",140:"Озон,",141:"ну",143:"бонусом",147:"Билайна.",148:"В",151:"59 000 ₽.",152:"",153:"",154:"",155:"Это",157:"расчёт",158:"на бумаге —",159:"это",161:"открутка.",162:"И",169:"клиентов.",170:"РКО",171:"—",177:"клиентов,",181:"это",186:"продукты.",187:"Многие",192:"офферы,",197:"деньги,",201:"по",202:"3 000 ₽,",203:"",206:"ниша",208:"окупается,",210:"уходят.",211:"Также",215:"мотив-",216:"трафик,",222:"офферов",229:"клиента.",230:"Где",233:"офферы,",235:"такое",236:"мотив-",237:"трафик —",238:"рассказываю",240:"своём",242:"обучении.",243:"Ищи",244:"Telegram",246:"профиле."}
 KEY={3,26,35,72,87,93,95,102,119,121,122,128,132,151,161,168,183,202,208,241,244}
@@ -19,7 +20,10 @@ cuts_src=sorted([x for d in DARK for x in d])
 pieces=[]
 for a,b in keep:
     pts=[a]+[c for c in cuts_src if a<c<b]+[b]
-    for i in range(len(pts)-1): pieces.append((pts[i],pts[i+1]))
+    # snap to the 60 fps grid so piece lengths are whole frames and the concat doesn't drift
+    pts=[round(x*60)/60 for x in pts]
+    for i in range(len(pts)-1):
+        if pts[i+1]>pts[i]: pieces.append((pts[i],pts[i+1]))
 def dark(a,b): return any(d0-0.01<=a and b<=d1+0.01 for d0,d1 in DARK)
 off=[];t=0
 for a,b in pieces: off.append(t); t+=b-a
@@ -54,13 +58,13 @@ for n,(a,b) in enumerate(pieces):
         s0=bgp
         if s0+d>BG[1]: s0=BG[0]
         bgp=s0+d
-        cmd=["ffmpeg","-loglevel","error","-y","-ss",str(s0),"-t",str(d),"-i","b/full60.mp4","-ss",str(a),"-t",str(d),"-i","b/full60.mp4",
+        cmd=["ffmpeg","-loglevel","error","-y","-ss",str(s0),"-t",str(d),"-i","b/full60.mp4","-ss",f"{a-0.002:.4f}","-t",str(d),"-i","b/full60.mp4",
              "-filter_complex",f"[0:v]setpts=PTS-STARTPTS,gblur=sigma=30,eq=brightness=0.03:saturation=0.85,setsar=1[v];[1:a]asetpts=PTS-STARTPTS,afade=t=in:d=0.02,afade=t=out:st={d-0.03:.3f}:d=0.03[a]",
              "-map","[v]","-map","[a]"]
     else:
-        cmd=["ffmpeg","-loglevel","error","-y","-ss",str(a),"-t",str(d),"-i","b/full60.mp4",
+        cmd=["ffmpeg","-loglevel","error","-y","-ss",f"{a-0.002:.4f}","-t",str(d),"-i","b/full60.mp4",
              "-filter_complex",f"[0:v]setpts=PTS-STARTPTS,setsar=1[v];[0:a]asetpts=PTS-STARTPTS,afade=t=in:d=0.02,afade=t=out:st={d-0.03:.3f}:d=0.03[a]","-map","[v]","-map","[a]"]
-    subprocess.run(cmd+["-r","60","-c:v","libx264","-crf","12","-preset","fast","-pix_fmt","yuv420p","-c:a","pcm_s16le","-ar","48000",out.replace(".mp4",".mov")],check=True)
+    subprocess.run(cmd+["-frames:v",str(round(d*60)),"-r","60","-c:v","libx264","-crf","12","-preset","fast","-pix_fmt","yuv420p","-c:a","pcm_s16le","-ar","48000",out.replace(".mp4",".mov")],check=True)
     lst.append(f"file 'pc/p{n:03d}.mov'")
 open("b/list.txt","w").write("\n".join(lst)+"\n")
 subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/list.txt","-c:v","copy","-af","loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000","-c:a","aac","-b:a","256k","b/cut_raw.mp4"],check=True)
