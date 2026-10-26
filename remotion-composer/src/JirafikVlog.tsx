@@ -134,6 +134,34 @@ export type JirafikVlogProps = {
     badges: { at: number; card: number; text: string; tone: "bad" | "warn" | "good"; anim?: "flicker" | "scale" }[];
     shield?: { at: number; card: number; text: string };
   };
+  // Explainer boards over a blurred shot: stacked cards that appear on cue
+  boards?: {
+    start: number;
+    end: number;
+    blur?: boolean; // blur whatever is behind (for boards over a face shot)
+    blocks: {
+      at: number;
+      icon?: "tv" | "bank" | "people" | "doc" | "card" | "coins";
+      title: string;
+      sub?: string;
+      value?: string;
+      count?: number;
+      suffix?: string;
+      tone?: "good" | "bad";
+      crossAt?: number;
+      chips?: { at: number; text: string; tone?: "good" | "bad" | "warn" }[];
+    }[];
+  }[];
+  // Payout table: rows appear as they are named, total counts up
+  table?: {
+    start: number;
+    end: number;
+    title: string;
+    rows: { at: number; name: string; value: string; note?: string }[];
+    totalAt: number;
+    total: number;
+    stamp?: { at: number; text: string };
+  };
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
   transitions?: { at: number; type: "whip" | "zoomin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
@@ -653,6 +681,111 @@ const Note: React.FC<{ n: NonNullable<JirafikVlogProps["notes"]>[number] }> = ({
         fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}` }}>
         {n.text}
       </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Boards and payout table
+// ---------------------------------------------------------------------------
+const Icon: React.FC<{ name: string }> = ({ name }) => {
+  const c = NAVY;
+  const box = { width: 64, height: 64, flex: "0 0 64px" } as const;
+  if (name === "tv") return (<svg viewBox="0 0 64 64" style={box}><rect x="6" y="14" width="52" height="34" rx="6" fill="none" stroke={c} strokeWidth="5" /><path d="M24 4 L32 14 L40 4" fill="none" stroke={c} strokeWidth="5" strokeLinecap="round" /><path d="M20 56 H44" stroke={c} strokeWidth="5" strokeLinecap="round" /></svg>);
+  if (name === "bank") return (<svg viewBox="0 0 64 64" style={box}><path d="M6 24 L32 8 L58 24 Z" fill={c} /><rect x="10" y="26" width="44" height="4" fill={c} /><rect x="14" y="32" width="6" height="18" fill={c} /><rect x="29" y="32" width="6" height="18" fill={c} /><rect x="44" y="32" width="6" height="18" fill={c} /><rect x="8" y="52" width="48" height="6" rx="2" fill={c} /></svg>);
+  if (name === "people") return (<svg viewBox="0 0 64 64" style={box}>{[10, 26, 42].map((x) => (<g key={x}><circle cx={x + 6} cy="22" r="7" fill={c} /><path d={`M${x - 2} 48 C${x - 2} 34 ${x + 14} 34 ${x + 14} 48 Z`} fill={c} /></g>))}</svg>);
+  if (name === "doc") return (<svg viewBox="0 0 64 64" style={box}><path d="M14 6 H40 L52 18 V58 H14 Z" fill="none" stroke={c} strokeWidth="5" strokeLinejoin="round" /><path d="M22 30 H44 M22 40 H44 M22 50 H36" stroke={c} strokeWidth="4" strokeLinecap="round" /></svg>);
+  if (name === "card") return (<svg viewBox="0 0 64 64" style={box}><rect x="4" y="14" width="56" height="36" rx="6" fill="none" stroke={c} strokeWidth="5" /><rect x="4" y="22" width="56" height="7" fill={c} /><path d="M12 40 H26" stroke={c} strokeWidth="4" strokeLinecap="round" /></svg>);
+  return (<svg viewBox="0 0 64 64" style={box}><ellipse cx="32" cy="18" rx="20" ry="7" fill={ORANGE} /><path d="M12 18 V30 C12 34 52 34 52 30 V18" fill={ORANGE} /><path d="M12 32 V44 C12 48 52 48 52 44 V32" fill={ORANGE} opacity=".85" /></svg>);
+};
+
+const CHIP = { good: "#2EA043", bad: "#E5484D", warn: "#8A8FA8" } as const;
+const Board: React.FC<{ b: NonNullable<JirafikVlogProps["boards"]>[number] }> = ({ b }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = b.start + frame / fps;
+  const total = (b.end - b.start) * fps;
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <AbsoluteFill style={{ opacity: out }}>
+      {b.blur && <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />}
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 260, gap: 26 }}>
+        {b.blocks.map((k, i) => {
+          if (t < k.at) return null;
+          const f = (t - k.at) * fps;
+          const inn = spring({ frame: f, fps, config: { damping: 18, stiffness: 200, overshootClamping: true } });
+          const cross = k.crossAt !== undefined ? spring({ frame: (t - k.crossAt) * fps, fps, config: { damping: 16, stiffness: 200 } }) : 0;
+          const prog = interpolate(f, [4, 26], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          const val = k.count !== undefined ? Math.round(k.count * (1 - Math.pow(1 - prog, 3))).toLocaleString("ru-RU").replace(/ /g, " ") + (k.suffix ?? "") : k.value;
+          return (
+            <div key={i} style={{ position: "relative", width: 900, transform: `translateY(${(1 - inn) * 260}px)`, opacity: Math.min(1, inn * 1.4) * (k.crossAt !== undefined && t >= k.crossAt ? 1 - 0.35 * cross : 1),
+              background: "#fff", borderRadius: 28, padding: "24px 30px", boxShadow: "0 16px 44px rgba(20,24,58,0.22)",
+              border: `6px solid ${k.tone === "good" ? ORANGE : k.tone === "bad" ? "#E5484D" : "transparent"}`, display: "flex", gap: 22, alignItems: "center" }}>
+              {k.icon && <Icon name={k.icon} />}
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 56, color: NAVY, lineHeight: 1.05 }}>{k.title}</div>
+                {k.sub && <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 34, color: "#2E4F8F", marginTop: 6, lineHeight: 1.25 }}>{k.sub}</div>}
+                {val && <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 84, color: k.tone === "bad" ? "#E5484D" : ORANGE, lineHeight: 1, marginTop: 8 }}>{val}</div>}
+                {k.chips && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 14 }}>
+                    {k.chips.filter((c) => t >= c.at).map((c, j) => {
+                      const cs = spring({ frame: (t - c.at) * fps, fps, config: { damping: 13, stiffness: 240 } });
+                      return (<div key={j} style={{ fontFamily: BODY, fontWeight: 800, fontSize: 34, color: "#fff", background: CHIP[c.tone ?? "good"], borderRadius: 14, padding: "6px 16px", transform: `scale(${0.4 + 0.6 * cs})`, transformOrigin: "left center", opacity: Math.min(1, cs * 1.6) }}>{c.text}</div>);
+                    })}
+                  </div>
+                )}
+              </div>
+              {k.crossAt !== undefined && cross > 0.01 && (
+                <div style={{ position: "absolute", left: 20, right: 20, top: "50%", height: 14, borderRadius: 7, background: "#E5484D", transform: `rotate(-7deg) scaleX(${cross})`, transformOrigin: "0 50%" }} />
+              )}
+            </div>
+          );
+        })}
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+const PayoutTable: React.FC<{ tb: NonNullable<JirafikVlogProps["table"]> }> = ({ tb }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = tb.start + frame / fps;
+  const total = (tb.end - tb.start) * fps;
+  const inn = spring({ frame, fps, config: { damping: 18, stiffness: 190, overshootClamping: true } });
+  const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const tp = interpolate((t - tb.totalAt) * fps, [0, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sum = Math.round(tb.total * (1 - Math.pow(1 - tp, 3))).toLocaleString("ru-RU").replace(/ /g, " ");
+  const st = tb.stamp ? spring({ frame: (t - tb.stamp.at) * fps, fps, config: { damping: 10, stiffness: 220 } }) : 0;
+  return (
+    <AbsoluteFill style={{ opacity: Math.min(inn, out) }}>
+      <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 170 }}>
+        <div style={{ position: "relative", width: 940, background: "#fff", borderRadius: 30, padding: "28px 34px 30px", boxShadow: "0 20px 56px rgba(20,24,58,0.25)", transform: `translateY(${(1 - inn) * 400}px)` }}>
+          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 36, color: "#2E4F8F", marginBottom: 12 }}>{tb.title}</div>
+          {tb.rows.map((r, i) => {
+            const v = spring({ frame: (t - r.at) * fps, fps, config: { damping: 16, stiffness: 230, overshootClamping: true } });
+            return (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16, padding: "7px 0", borderTop: i ? "2px solid #ECEEF4" : "none",
+                opacity: t >= r.at ? v : 0.18, transform: `translateX(${t >= r.at ? (1 - v) * 60 : 0}px)` }}>
+                <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 44, color: NAVY, minWidth: 0 }}>
+                  {r.name}{r.note && <span style={{ fontWeight: 600, fontSize: 30, color: "#5A6080" }}>{"  " + r.note}</span>}
+                </div>
+                <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 52, color: ORANGE, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{r.value}</div>
+              </div>
+            );
+          })}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 14, paddingTop: 16, borderTop: `4px solid ${NAVY}`, opacity: t >= tb.totalAt ? 1 : 0 }}>
+            <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: NAVY }}>Итого</div>
+            <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 84, color: ORANGE, fontVariantNumeric: "tabular-nums" }}>{sum} ₽</div>
+          </div>
+          {tb.stamp && st > 0.01 && (
+            <div style={{ position: "absolute", right: -20, top: -46, transform: `rotate(-6deg) scale(${0.5 + 0.5 * st})`, opacity: Math.min(1, st * 1.4),
+              background: "#2EA043", color: "#fff", fontFamily: BODY, fontWeight: 800, fontSize: 40, padding: "12px 24px", borderRadius: 16, boxShadow: "0 12px 30px rgba(20,24,58,0.3)" }}>
+              {tb.stamp.text}
+            </div>
+          )}
+        </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
@@ -1254,6 +1387,16 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
       <Sequence durationInFrames={vf}>
         <MovingVideo {...p} />
         {p.transitions && <TransitionFx list={p.transitions} src={p.videoSrc} />}
+        {(p.boards ?? []).map((b, i) => (
+          <Sequence key={`bd${i}`} from={f(b.start)} durationInFrames={f(b.end - b.start)}>
+            <Board b={b} />
+          </Sequence>
+        ))}
+        {p.table && (
+          <Sequence from={f(p.table.start)} durationInFrames={f(p.table.end - p.table.start)}>
+            <PayoutTable tb={p.table} />
+          </Sequence>
+        )}
         {p.accounts && (
           <Sequence from={f(p.accounts.start)} durationInFrames={f(p.accounts.end - p.accounts.start)}>
             <Accounts a={p.accounts} />
