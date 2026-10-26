@@ -166,7 +166,7 @@ export type JirafikVlogProps = {
   };
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
-  transitions?: { at: number; type: "whip" | "zoomin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
+  transitions?: { at: number; type: "whip" | "zoomin" | "blurin" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
   reveal?: VlogReveal;
   captionsFrom: number;
@@ -291,6 +291,11 @@ const MovingVideo: React.FC<JirafikVlogProps> = (p) => {
     if (tr.type === "zoomin" && d > -0.16 && d < 0.18) {
       const k = d < 0 ? Math.pow((d + 0.16) / 0.16, 2) : Math.pow(1 - d / 0.18, 2);
       tZoom = 1.4 * k; tBlur = 16 * k; tBright = 1 + 0.25 * k;
+    }
+    // blurin: the speaker's shot melts into the blurred background of the next (voice-over) shot
+    if (tr.type === "blurin" && d > -0.5 && d < 0.25) {
+      const k = d < 0 ? Math.pow((d + 0.5) / 0.5, 1.6) : 1 - d / 0.25;
+      tBlur = d < 0 ? 30 * k : 6 * k; tZoom = 0.06 * k;
     }
     if (tr.type === "flash" && d > -0.1 && d < 0.3) {
       const k = d < 0 ? (d + 0.1) / 0.1 : Math.pow(1 - d / 0.3, 1.6);

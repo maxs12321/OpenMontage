@@ -1460,6 +1460,11 @@
    "volume": 0.35
   },
   {
+   "at": 51.395,
+   "src": "jirafik/sfx2-whoosh-short.wav",
+   "volume": 0.3
+  },
+  {
    "at": 53.09,
    "src": "jirafik/sfx2-whoosh-short.wav",
    "volume": 0.4
@@ -1535,9 +1540,14 @@
    "dir": -1
   },
   {
+   "at": 51.745,
+   "type": "blurin",
+   "dir": 1
+  },
+  {
    "at": 67.02,
    "type": "whip",
-   "dir": 1
+   "dir": -1
   }
  ],
  "plateTheme": "light",

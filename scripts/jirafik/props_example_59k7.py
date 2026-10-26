@@ -46,8 +46,8 @@ cta={"start":at("Ищи"),"end":vd,"label":"Где взять офферы — �
 J="jirafik/"; S=[]
 def add(t,src,vol): S.append({"at":round(t,3),"src":J+src,"volume":vol})
 add(0.0,"sfx2-appear.wav",0.4)
-TR=[(D1,"zoomin"),(F2,"whip"),(D2,"whip"),(F3,"whip"),(F4,"whip")]
-TS={"whip":("sfx2-swipe.wav",0.55,-0.12),"zoomin":("sfx2-zoom.wav",0.4,-0.2)}
+TR=[(D1,"zoomin"),(F2,"whip"),(D2,"whip"),(F3,"whip"),(D3,"blurin"),(F4,"whip")]
+TS={"whip":("sfx2-swipe.wav",0.55,-0.12),"zoomin":("sfx2-zoom.wav",0.4,-0.2),"blurin":("sfx2-whoosh-short.wav",0.3,-0.35)}
 for t_,ty in TR: src,vol,o=TS[ty]; add(t_+o,src,vol)
 add(big[0]["start"],"sfx2-zoom.wav",0.35)
 add(table["totalAt"],"sfx2-gauge.wav",0.35)
