@@ -17,7 +17,7 @@ head=json.loads(subprocess.check_output(["/home/user/OpenMontage/.venv/bin/pytho
 f={"family":"'Russo One', sans-serif","weight":400,"lineHeight":0.95}
 lines=["КОМИССИЯ"]; size=300
 while max(ImageFont.truetype("/root/.fonts/RussoOne-Regular.ttf",size).getlength(l) for l in lines)>740: size-=5
-big=[{"start":a,"end":b,"lines":lines,"size":size,"top":max(260,int(head+45-len(lines)*size*0.95)),"align":"center","font":f}]
+big=[{"start":a,"end":b,"lines":lines,"size":size,"top":max(340,int(head+45-len(lines)*size*0.95)),"align":"center","font":f}]
 tstart=round(at("таблица")-0.1,3); tend=round(at("открутка")+0.75,3)
 table={"start":tstart,"end":tend,"title":"Офферы за одного клиента","rows":[
   {"at":at("Альфа-Банк"),"name":"Альфа-Банк","value":"14 000 ₽"},
@@ -27,7 +27,7 @@ table={"start":tstart,"end":tend,"title":"Офферы за одного кли�
   {"at":at("Сбербанк"),"name":"Сбербанк","value":"4 000 ₽","note":"+3 000 ₽ клиенту"},
   {"at":at("Озон"),"name":"Ozon Банк","value":"8 000 ₽"},
   {"at":at("корпоративная"),"name":"Симка Билайн","value":"6 000 ₽","note":"бонус"}],
-  "totalAt":at("выходит"),"total":59000,"stamp":{"at":at("закрытая"),"text":"Закрытая открутка ✓"}}
+  "totalAt":at("выходит"),"total":59000,"stamp":{"at":at("закрытая"),"text":"Закрытая открутка ✓"},"columns":2,"blur":False}
 boards=[
  {"start":D1,"end":F2,"blocks":[
    {"at":D1+0.15,"icon":"doc","title":"РКО","sub":"расчётно-кассовое обслуживание","chips":[{"at":at("счёт"),"text":"счёт для бизнеса"}]},
@@ -55,8 +55,12 @@ add(table["stamp"]["at"],"sfx2-whoosh-short.wav",0.4)
 add(cta["start"],"sfx2-whoosh-short.wav",0.4)
 S.sort(key=lambda x:x["at"])
 transitions=[{"at":t_,"type":ty,"dir":[1,-1][k%2]} for k,(t_,ty) in enumerate(TR)]
-jr=[[round(at("При")-0.08,3),D1,0.18],[round(at("Клиенту")-0.06,3),D2,0.18],[round(at("Где")-0.1,3),vd,0.18]]
-for r in jr: r+=[42.0,48.0]
+# close-up: anchor the zoom at the bottom edge so the wall above is cropped and his face rises,
+# and shift sideways so he ends up centred (he sits left of centre: face ~ x 0.43, y 0.55)
+Z=0.15; XH=0.43
+ox=max(0.0,min(1.0,((1+Z)*XH-0.5)/Z))
+jr=[[round(at("При")-0.08,3),D1,Z],[round(at("Клиенту")-0.06,3),D2,Z],[round(at("Где")-0.1,3),vd,Z]]
+for r in jr: r+=[100.0,round(100*ox,1)]
 props={"videoSrc":"jirafik/v7-cut.mp4","videoDuration":vd,"fps":60,"cuts":d["cuts"],"whooshAt":[],"emphasis":[],
  "words":W,"stickers":[],"inserts":[],"cta":cta,"boards":boards,"table":table,
  "hook":{"tag":"","line1":"59 000 ₽","line2":"за одного клиента","until":round(at("При")-0.05,3),"teaser":"а клиент не платит ни копейки","size":124,"line2At":at("за")-0.05},

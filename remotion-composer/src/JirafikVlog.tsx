@@ -161,6 +161,8 @@ export type JirafikVlogProps = {
     totalAt: number;
     total: number;
     stamp?: { at: number; text: string };
+    blur?: boolean;      // blur the picture behind (only over shots without the speaker)
+    columns?: 1 | 2;     // 2 = compact card above the speaker's head
   };
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
@@ -676,7 +678,7 @@ const Note: React.FC<{ n: NonNullable<JirafikVlogProps["notes"]>[number] }> = ({
   const total = (n.end - n.start) * fps;
   const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: n.top ?? 260, opacity: out }}>
+    <AbsoluteFill style={{ alignItems: "center", top: Math.max(360, n.top ?? 360), opacity: out }}>
       <div style={{ transform: `scale(${0.3 + 0.7 * v})`, opacity: Math.min(1, v * 1.6), background: "#fff", color: NAVY, fontFamily: BODY, fontWeight: 800,
         fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}` }}>
         {n.text}
@@ -709,7 +711,7 @@ const Board: React.FC<{ b: NonNullable<JirafikVlogProps["boards"]>[number] }> = 
   return (
     <AbsoluteFill style={{ opacity: out }}>
       {b.blur && <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />}
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 260, gap: 26 }}>
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 340, gap: 24 }}>
         {b.blocks.map((k, i) => {
           if (t < k.at) return null;
           const f = (t - k.at) * fps;
@@ -756,31 +758,42 @@ const PayoutTable: React.FC<{ tb: NonNullable<JirafikVlogProps["table"]> }> = ({
   const tp = interpolate((t - tb.totalAt) * fps, [0, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const sum = Math.round(tb.total * (1 - Math.pow(1 - tp, 3))).toLocaleString("ru-RU").replace(/ /g, " ");
   const st = tb.stamp ? spring({ frame: (t - tb.stamp.at) * fps, fps, config: { damping: 10, stiffness: 220 } }) : 0;
+  const two = tb.columns === 2;
+  const rowEl = (r: (typeof tb.rows)[number], i: number) => {
+    const v = spring({ frame: (t - r.at) * fps, fps, config: { damping: 16, stiffness: 230, overshootClamping: true } });
+    return (
+      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, padding: two ? "5px 0" : "4px 0",
+        borderTop: two ? "2px solid #ECEEF4" : i ? "2px solid #ECEEF4" : "none",
+        opacity: t >= r.at ? v : 0.18, transform: `translateY(${t >= r.at ? (1 - v) * 24 : 0}px)` }}>
+        <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: two ? 31 : 40, color: NAVY, minWidth: 0, lineHeight: 1.15 }}>
+          {r.name}
+          {r.note && <div style={{ fontWeight: 600, fontSize: two ? 21 : 28, color: "#5A6080" }}>{r.note}</div>}
+        </div>
+        <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: two ? 38 : 48, color: ORANGE, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{r.value}</div>
+      </div>
+    );
+  };
+  const half = Math.ceil(tb.rows.length / 2);
   return (
     <AbsoluteFill style={{ opacity: Math.min(inn, out) }}>
-      <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 170 }}>
-        <div style={{ position: "relative", width: 940, background: "#fff", borderRadius: 30, padding: "28px 34px 30px", boxShadow: "0 20px 56px rgba(20,24,58,0.25)", transform: `translateY(${(1 - inn) * 400}px)` }}>
-          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 36, color: "#2E4F8F", marginBottom: 12 }}>{tb.title}</div>
-          {tb.rows.map((r, i) => {
-            const v = spring({ frame: (t - r.at) * fps, fps, config: { damping: 16, stiffness: 230, overshootClamping: true } });
-            return (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16, padding: "7px 0", borderTop: i ? "2px solid #ECEEF4" : "none",
-                opacity: t >= r.at ? v : 0.18, transform: `translateX(${t >= r.at ? (1 - v) * 60 : 0}px)` }}>
-                <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 44, color: NAVY, minWidth: 0 }}>
-                  {r.name}{r.note && <span style={{ fontWeight: 600, fontSize: 30, color: "#5A6080" }}>{"  " + r.note}</span>}
-                </div>
-                <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 52, color: ORANGE, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{r.value}</div>
-              </div>
-            );
-          })}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 14, paddingTop: 16, borderTop: `4px solid ${NAVY}`, opacity: t >= tb.totalAt ? 1 : 0 }}>
-            <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: NAVY }}>Итого</div>
-            <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: 84, color: ORANGE, fontVariantNumeric: "tabular-nums" }}>{sum} ₽</div>
+      {tb.blur && <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />}
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 330 }}>
+        <div style={{ position: "relative", width: two ? 980 : 940, background: "rgba(255,255,255,0.96)", borderRadius: 28, padding: two ? "18px 26px 20px" : "28px 34px 30px",
+          boxShadow: "0 18px 50px rgba(20,24,58,0.28)", transform: `translateY(${(1 - inn) * -160}px)` }}>
+          <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: two ? 28 : 36, color: "#2E4F8F", marginBottom: 6 }}>{tb.title}</div>
+          {two ? (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 34 }}>
+              <div>{tb.rows.slice(0, half).map((r, i) => rowEl(r, i))}</div>
+              <div>{tb.rows.slice(half).map((r, i) => rowEl(r, i + half))}</div>
+            </div>
+          ) : tb.rows.map(rowEl)}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 8, paddingTop: 8, borderTop: `4px solid ${NAVY}`, opacity: t >= tb.totalAt ? 1 : 0 }}>
+            <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: two ? 36 : 46, color: NAVY }}>Итого</div>
+            <div style={{ fontFamily: TITLE, fontWeight: 700, fontSize: two ? 64 : 76, color: ORANGE, fontVariantNumeric: "tabular-nums" }}>{sum} ₽</div>
           </div>
           {tb.stamp && st > 0.01 && (
-            <div style={{ position: "absolute", right: -20, top: -46, transform: `rotate(-6deg) scale(${0.5 + 0.5 * st})`, opacity: Math.min(1, st * 1.4),
-              background: "#2EA043", color: "#fff", fontFamily: BODY, fontWeight: 800, fontSize: 40, padding: "12px 24px", borderRadius: 16, boxShadow: "0 12px 30px rgba(20,24,58,0.3)" }}>
+            <div style={{ position: "absolute", right: -16, bottom: -40, transform: `rotate(-6deg) scale(${0.5 + 0.5 * st})`, opacity: Math.min(1, st * 1.4),
+              background: "#2EA043", color: "#fff", fontFamily: BODY, fontWeight: 800, fontSize: 34, padding: "10px 20px", borderRadius: 14, boxShadow: "0 12px 30px rgba(20,24,58,0.3)" }}>
               {tb.stamp.text}
             </div>
           )}
@@ -1296,7 +1309,7 @@ const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]>; light?: boolean }
   const { fps } = useVideoConfig();
   const inn = spring({ frame, fps, config: { damping: 12, stiffness: 170 } });
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: 330 }}>
+    <AbsoluteFill style={{ alignItems: "center", top: 380 }}>
       <div
         style={{
           transform: `scale(${0.7 + 0.3 * inn})`,
