@@ -51,7 +51,7 @@ CLOSE=[(at("При")-0.08,T1),(at("Но")-0.08,at("Следующий")-0.05),(a
 jr=[]
 for s0,e0 in CLOSE:
     x=xh(s0+0.01); ox=max(0.0,min(1.0,((1+Z)*x-0.5)/Z))
-    jr.append([round(s0,3),round(e0,3),Z,50.0,round(100*ox,1)])
+    jr.append([round(s0,3),round(e0,3),Z,50.0,50.0])   # straight zoom, never shifted sideways
 props={"videoSrc":"jirafik/v8-cut.mp4","videoDuration":vd,"fps":60,"cuts":d["cuts"],"whooshAt":[],"emphasis":[],
  "words":W,"stickers":[],"inserts":[],"chapters":chapters,"calc":calc,"cta":cta,
  "hook":{"tag":"","line1":"53 000 ₽","line2":"за одного клиента","until":round(at("При")-0.05,3),"teaser":"а клиент не отдал ни копейки","size":124,"line2At":at("за")-0.05},
