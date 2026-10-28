@@ -25,6 +25,25 @@ for a,b in keep:
     for i in range(len(pts)-1):
         if pts[i+1]>pts[i]: pieces.append((pts[i],pts[i+1]))
 def dark(a,b): return any(d0-0.01<=a and b<=d1+0.01 for d0,d1 in DARK)
+# move every pause cut into the quietest 10 ms of the pause (Whisper segment edges often land on a breath
+# or the tail of a syllable, which sounds like a glitch when cut)
+import numpy as np
+SR=48000
+# low rumble (AC/street, 40-200 Hz) under the voice: phone speakers hide it, headphones don't, and it jumps at every cut
+SRC=np.frombuffer(subprocess.run(["ffmpeg","-loglevel","error","-i","b/full60.mp4","-vn","-ac","1","-ar",str(SR),"-af","highpass=f=100:poles=2,highpass=f=100:poles=2","-f","s16le","-"],capture_output=True,check=True).stdout,np.int16).astype(np.float32)/32768
+def quietest(t0,t1):
+    ts=np.arange(t0,t1,0.01)
+    if not len(ts): return (t0+t1)/2
+    e=[np.mean(SRC[int(t*SR):int(t*SR)+480]**2) for t in ts]
+    return float(ts[int(np.argmin(e))])+0.005
+ref=[list(p) for p in pieces]
+for k in range(len(ref)-1):
+    b,a2=ref[k][1],ref[k+1][0]
+    if a2-b<0.02: continue   # shot boundary inside continuous audio
+    nb=round(quietest(b-0.12,min(a2,b+0.25))*60)/60
+    na=round(quietest(max(nb,a2-0.25),a2+0.1)*60)/60
+    if na>nb and nb>ref[k][0]+0.2 and na<ref[k+1][1]-0.2: ref[k][1],ref[k+1][0]=nb,na
+pieces=[tuple(p) for p in ref]
 off=[];t=0
 for a,b in pieces: off.append(t); t+=b-a
 total=t
@@ -67,7 +86,22 @@ for n,(a,b) in enumerate(pieces):
     subprocess.run(cmd+["-frames:v",str(round(d*60)),"-r","60","-c:v","libx264","-crf","12","-preset","fast","-pix_fmt","yuv420p","-c:a","pcm_s16le","-ar","48000",out.replace(".mp4",".mov")],check=True)
     lst.append(f"file 'pc/p{n:03d}.mov'")
 open("b/list.txt","w").write("\n".join(lst)+"\n")
-subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/list.txt","-c:v","copy","-af","loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000","-c:a","aac","-b:a","256k","b/cut_raw.mp4"],check=True)
+# audio: stitch the pieces straight from the source with 40 ms linear crossfades centred on each cut,
+# so the room tone never drops to silence between pieces (a fade-out/fade-in hole sounds like a click)
+H=0.02
+out=np.zeros(int((total+0.1)*SR),np.float32)
+for k,((a,b),o) in enumerate(zip(pieces,off)):
+    pre=0 if k==0 else H; post=0 if k==len(pieces)-1 else H
+    seg=SRC[int(round((a-pre)*SR)):int(round((b+post)*SR))].copy()
+    n=len(seg); fi=int(2*pre*SR); fo=int(2*post*SR)
+    if fi: seg[:fi]*=np.linspace(0,1,fi)
+    if fo: seg[n-fo:]*=np.linspace(1,0,fo)
+    st=int(round((o-pre)*SR)); out[st:st+n]+=seg[:len(out)-st]
+import wave
+with wave.open("b/cut_audio.wav","wb") as w:
+    w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
+    w.writeframes((np.clip(out,-1,1)*32767).astype(np.int16).tobytes())
+subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/list.txt","-i","b/cut_audio.wav","-map","0:v","-map","1:a","-c:v","copy","-af","loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000","-ac","2","-c:a","aac","-b:a","256k","-shortest","b/cut_raw.mp4"],check=True)
 subprocess.run(["ffmpeg","-loglevel","error","-y","-i","b/cut_raw.mp4","-vf","tpad=stop_mode=clone:stop_duration=0.4","-af","apad=pad_dur=0.4","-c:v","libx264","-crf","12","-preset","fast","-pix_fmt","yuv420p","-c:a","aac","-b:a","256k","-t",str(round(total+0.4,3)),"b/cut.mp4"],check=True)
 json.dump({"total":round(total,3),"cuts":[round(o,3) for o in off[1:]],"shots":[[round(a,3),round(b,3),k] for a,b,k in shots],"words":words},open("timeline.json","w"),ensure_ascii=False,indent=1)
 print("total",round(total,2)); print("shots",[[round(a,2),round(b,2),k] for a,b,k in shots])

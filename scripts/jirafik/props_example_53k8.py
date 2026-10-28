@@ -10,7 +10,7 @@ def at(txt,n=1):
     raise KeyError(txt)
 vd=round(d["total"]-0.07,3)
 # take changes (re-recorded parts, found by scene detection on the cut)
-T1,T2,T3,T4=9.883,14.817,50.5,63.317
+T1,T2,T3,T4=9.933,14.85,50.717,63.683
 # face centre x per take (share of width) - he sits a bit left of centre
 TAKES=[(0,T1,0.44),(T1,T2,0.43),(T2,T3,0.46),(T3,T4,0.39),(T4,vd,0.39)]
 def xh(t): return next(x for a,b,x in TAKES if a<=t<b)
