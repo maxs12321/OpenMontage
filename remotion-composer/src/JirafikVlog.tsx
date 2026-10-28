@@ -97,7 +97,7 @@ export type JirafikVlogProps = {
   sfx?: { at: number; src: string; volume?: number }[];
   inserts?: VlogInsert[];
   // list videos: "№1 Альфа-Банк · 14 000 ₽" chip at the top while that item is discussed
-  chapters?: { start: number; end: number; kicker: string; title: string; value?: string }[];
+  chapters?: { start: number; end: number; kicker: string; title: string; value?: string; note?: string; noteAt?: number }[];
   // one-off sum card, e.g. 14 000 + 9 000 + 20 000 = 43 000 ₽
   calc?: { start: number; end: number; parts: string[]; total: string };
   // call to action pill at the end
@@ -1265,9 +1265,10 @@ const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number]; 
         style={{
           position: "absolute",
           left: 60,
-          top: 150,
+          top: 350,
           opacity: Math.min(inn, out),
-          transform: `translateX(${(1 - inn) * -80}px)`,
+          transform: `translateX(${(1 - inn) * -80}px) scale(1.2)`,
+          transformOrigin: "0 0",
           display: "flex",
           alignItems: "stretch",
           borderRadius: 18,
@@ -1281,6 +1282,13 @@ const Chapter: React.FC<{ c: NonNullable<JirafikVlogProps["chapters"]>[number]; 
         <div style={{ background: light ? "rgba(255,255,255,0.94)" : "rgba(20,24,58,0.92)", padding: "10px 24px 12px" }}>
           <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: 46, color: light ? NAVY : "#fff", lineHeight: 1.1 }}>{c.title}</div>
           {c.value && <div style={{ fontFamily: BODY, fontWeight: 700, fontSize: 36, color: ORANGE, lineHeight: 1.2 }}>{c.value}</div>}
+          {c.note && (() => {
+            // condition line types in when it is said
+            const nIn = spring({ frame: frame - ((c.noteAt ?? c.start) - c.start) * fps, fps, config: { damping: 18, stiffness: 170 } });
+            return (
+              <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 30, color: light ? "#5A6080" : "#C9CDE6", lineHeight: 1.25, marginTop: 4, maxWidth: 560, opacity: nIn, transform: `translateY(${(1 - nIn) * 12}px)` }}>{c.note}</div>
+            );
+          })()}
         </div>
       </div>
     </AbsoluteFill>
@@ -1296,10 +1304,10 @@ const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]>; light?: boolean
   const total = (c.end - c.start) * fps;
   const out = interpolate(frame, [total - 8, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const card = spring({ frame, fps, config: { damping: 16, stiffness: 160 } });
-  const step = 7;
+  const step = c.parts.length > 4 ? 5 : 7;
   const totalIn = spring({ frame: frame - step * c.parts.length - 4, fps, config: { damping: 10, stiffness: 200 } });
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: 300, opacity: out }}>
+    <AbsoluteFill style={{ alignItems: "center", top: 350, opacity: out }}>
       <div
         style={{
           transform: `scale(${0.85 + 0.15 * card})`,
@@ -1312,7 +1320,7 @@ const Calc: React.FC<{ c: NonNullable<JirafikVlogProps["calc"]>; light?: boolean
           boxShadow: light ? "0 14px 34px rgba(20,24,58,0.2)" : "0 20px 50px rgba(0,0,0,0.45)",
         }}
       >
-        <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", fontFamily: BODY, fontWeight: 800, fontSize: 50, color: light ? NAVY : "#fff" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", maxWidth: 860, rowGap: 4, gap: 16, alignItems: "center", justifyContent: "center", fontFamily: BODY, fontWeight: 800, fontSize: c.parts.length > 4 ? 44 : 50, color: light ? NAVY : "#fff" }}>
           {c.parts.map((p, i) => {
             const v = spring({ frame: frame - i * step, fps, config: { damping: 14, stiffness: 200 } });
             return (
