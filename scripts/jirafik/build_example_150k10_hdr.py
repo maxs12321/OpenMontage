@@ -37,7 +37,7 @@ open("b/hdr/zlist.txt","w").write("\n".join(lst)+"\n")
 subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/hdr/zlist.txt","-c","copy","b/hdr/zoomed.mov"],check=True)
 # 3) graphics: sRGB -> HLG BT.2020 (white at 203 nits, like iOS UI over HDR), overlay; person back on top of the big word
 bw=P["bigWords"][0] if P.get("bigWords") else None
-fl=["[1:v]format=rgba,split[oc][oa]","[oc]format=gbrpf32le,zscale=tin=iec61966-2-1:pin=bt709:t=arib-std-b67:p=bt2020:npl=203,zscale=m=bt2020nc:r=tv,format=yuv420p10le[occ]",
+fl=["[1:v]format=rgba,split[oc][oa]","[oc]format=gbrpf32le,zscale=tin=iec61966-2-1:pin=bt709:t=arib-std-b67:p=bt2020:npl=600,zscale=m=bt2020nc:r=tv,format=yuv420p10le[occ]",
     "[oa]alphaextract,format=gray[oaa]","[occ][oaa]alphamerge,format=yuva420p10le[o]",
     "[0:v]format=yuv420p10le[b]","[b][o]overlay=format=yuv420p10:eof_action=pass[v1]"]
 ins=["-i","b/hdr/zoomed.mov","-framerate","60","-i","b/ovl/element-%04d.png" if os.path.exists("b/ovl/element-0000.png") else "b/ovl/element-%03d.png"]
