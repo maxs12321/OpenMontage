@@ -710,7 +710,8 @@ const Note: React.FC<{ n: NonNullable<JirafikVlogProps["notes"]>[number] }> = ({
   return (
     <AbsoluteFill style={{ alignItems: "center", top: Math.max(360, n.top ?? 360), opacity: out }}>
       <div style={{ transform: `scale(${0.3 + 0.7 * v})`, opacity: Math.min(1, v * 1.6), background: "#fff", color: NAVY, fontFamily: BODY, fontWeight: 800,
-        fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}` }}>
+        fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}`,
+        maxWidth: 900, textAlign: "center", lineHeight: 1.15 }}>
         {n.text}
       </div>
     </AbsoluteFill>
