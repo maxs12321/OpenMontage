@@ -168,6 +168,8 @@ export type JirafikVlogProps = {
   notes?: { start: number; end: number; text: string; top?: number }[];
   transitions?: { at: number; type: "whip" | "zoomin" | "blurin" | "dissolve" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
   showProgress?: boolean; // orange progress bar at the top (default on)
+  // render only the graphics on a transparent background (the HDR video is composited later with ffmpeg)
+  overlayOnly?: boolean;
   reveal?: VlogReveal;
   captionsFrom: number;
   endCard: { seconds: number; question: string; handles: string[] };
@@ -1435,9 +1437,15 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
   const vf = Math.round(p.videoDuration * fps);
   const f = (s: number) => Math.round(s * fps);
   return (
-    <AbsoluteFill style={{ backgroundColor: NAVY }}>
+    <AbsoluteFill style={{ backgroundColor: p.overlayOnly ? "transparent" : NAVY }}>
       <Sequence durationInFrames={vf}>
-        <MovingVideo {...p} />
+        {p.overlayOnly
+          ? (p.bigWords ?? []).map((w, i) => (
+              <Sequence key={`obw${i}`} from={f(w.start)} durationInFrames={f(w.end - w.start)}>
+                <BigWord w={w} />
+              </Sequence>
+            ))
+          : <MovingVideo {...p} />}
         {p.transitions && <TransitionFx list={p.transitions} src={p.videoSrc} />}
         {(p.boards ?? []).map((b, i) => (
           <Sequence key={`bd${i}`} from={f(b.start)} durationInFrames={f(b.end - b.start)}>
