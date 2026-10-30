@@ -43,7 +43,7 @@ fl=["[1:v]format=rgba,split[oc][oa]","[oc]format=gbrpf32le,zscale=tin=iec61966-2
 ins=["-i","b/hdr/zoomed.mov","-framerate","60","-i","b/ovl/element-%04d.png" if os.path.exists("b/ovl/element-0000.png") else "b/ovl/element-%03d.png"]
 last="v1"
 if bw and (not LIM or bw["start"]<end):
-    ins+=["-i","b/person.webm","-i","b/hdr/zoomed.mov"]
+    ins+=["-c:v","libvpx-vp9","-i","b/person.webm","-i","b/hdr/zoomed.mov"]
     fl+=[f"[2:v]alphaextract,format=gray,scale=1080:1920[m]",f"[3:v]format=yuv420p10le[pf]","[pf][m]alphamerge,format=yuva420p10le[p]",
          f"[v1][p]overlay=format=yuv420p10:enable='between(t,{bw['start']},{bw['end']})'[v2]"]
     last="v2"
