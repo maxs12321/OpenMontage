@@ -3,13 +3,13 @@
 import json, subprocess, sys, os
 LIM=float(sys.argv[1]) if len(sys.argv)>1 else None
 FPS=60
-exec(open("build2.py").read().split("off=[];t=0")[0])          # same cut list as the SDR build
+exec(open("build2.py").read().split("off=[];t=0")[0].replace("b/full60n.mp4","raw/src.mov"))          # same cut list as the SDR build
 off=[];t=0
 for a,b in pieces: off.append(t); t+=b-a
 total=t
 P=json.load(open("/home/user/OpenMontage/remotion-composer/public/demo-props/jirafik-150k10n.json"))
 TAG=["-color_primaries","bt2020","-color_trc","arib-std-b67","-colorspace","bt2020nc"]
-PR=["-c:v","prores_ks","-profile:v","3","-pix_fmt","yuv422p10le"]+TAG
+PR=["-c:v","libx264","-preset","fast","-crf","2","-pix_fmt","yuv422p10le"]+TAG   # near-lossless 10-bit, ~6x smaller than ProRes HQ
 os.makedirs("b/hdr",exist_ok=True)
 # 1) cut from the HLG source (10-bit, untouched colour), 60 fps, 1080x1920
 lst=[]
