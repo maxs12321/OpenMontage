@@ -11,7 +11,7 @@ def at(txt,n=1):
 vd=round(d["total"]-0.07,3)
 # 5 parts after the hook; transitions between parts (none after the hook)
 T1,T2,T3,T4=[round(x-0.15,3) for x in (at("За",3),at("И",2),at("Но"),at("Как",2))]
-TRANS=[{"at":T1,"type":"whip","dir":1},{"at":T2,"type":"zoomin"},{"at":T3,"type":"dissolve"},{"at":T4,"type":"whip","dir":-1}]
+TRANS=[{"at":T1,"type":"whip","dir":1},{"at":T2,"type":"whipv","dir":-1},{"at":T3,"type":"whipv","dir":1},{"at":T4,"type":"whip","dir":-1}]
 notes=[{"start":at("Вообще"),"end":at("Банкам")-0.1,"text":"Направление работает уже около 6 лет","top":380},
        {"start":at("по-честному"),"end":at("Зато")-0.1,"text":"Не за один вечер: довести клиента и выполнить условия банков","top":380},
        {"start":at("Зато"),"end":T4-0.05,"text":"Без вложений · без опыта","top":380}]
@@ -36,8 +36,8 @@ J="jirafik/"; S=[]
 def add(t,src,vol): S.append({"at":round(t,3),"src":J+src,"volume":vol})
 add(0.0,"sfx2-appear.wav",0.4)
 add(T1-0.12,"sfx2-swipe.wav",0.5)
-add(T2-0.1,"sfx2-zoom.wav",0.4)
-add(T3-0.05,"sfx2-appear.wav",0.3)
+add(T2-0.12,"sfx2-swipe.wav",0.5)
+add(T3-0.12,"sfx2-swipe.wav",0.5)
 add(T4-0.12,"sfx2-swipe.wav",0.5)
 S.sort(key=lambda x:x["at"])
 Z=0.22

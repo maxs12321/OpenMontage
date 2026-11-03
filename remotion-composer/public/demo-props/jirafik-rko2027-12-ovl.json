@@ -943,14 +943,14 @@
    "volume": 0.5
   },
   {
-   "at": 27.303,
-   "src": "jirafik/sfx2-zoom.wav",
-   "volume": 0.4
+   "at": 27.283,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.5
   },
   {
-   "at": 37.613,
-   "src": "jirafik/sfx2-appear.wav",
-   "volume": 0.3
+   "at": 37.543,
+   "src": "jirafik/sfx2-swipe.wav",
+   "volume": 0.5
   },
   {
    "at": 45.603,

@@ -11,22 +11,23 @@ P=json.load(open("/home/user/OpenMontage/remotion-composer/public/demo-props/jir
 TAG=["-color_primaries","bt2020","-color_trc","arib-std-b67","-colorspace","bt2020nc"]
 PR=["-c:v","libx264","-preset","fast","-crf","2","-pix_fmt","yuv422p10le"]+TAG   # near-lossless 10-bit, ~6x smaller than ProRes HQ
 os.makedirs("b/hdr",exist_ok=True)
-# 1) cut from the HLG source (10-bit, untouched colour), 60 fps, 1080x1920
-lst=[]
-for n,((a,b),o) in enumerate(zip(pieces,off)):
-    if LIM and o>LIM+1: break
-    out=f"b/hdr/p{n:03d}.mov"
-    subprocess.run(["ffmpeg","-loglevel","error","-y","-ss",f"{a-0.002:.4f}","-i","raw/src.mov","-an","-vf","fps=60,scale=1080:1920:flags=lanczos",
-                    "-frames:v",str(round((b-a)*FPS))]+PR+[out],check=True)
-    lst.append(f"file 'p{n:03d}.mov'")
-open("b/hdr/list.txt","w").write("\n".join(lst)+"\n")
-subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/hdr/list.txt","-c","copy","b/hdr/cut.mov"],check=True)
+if LIM or not os.path.exists('b/hdr/cut.mov'):
+  # 1) cut from the HLG source (10-bit, untouched colour), 60 fps, 1080x1920
+  lst=[]
+  for n,((a,b),o) in enumerate(zip(pieces,off)):
+      if LIM and o>LIM+1: break
+      out=f"b/hdr/p{n:03d}.mov"
+      subprocess.run(["ffmpeg","-loglevel","error","-y","-ss",f"{a-0.002:.4f}","-i","raw/src.mov","-an","-vf","fps=60,scale=1080:1920:flags=lanczos",
+                      "-frames:v",str(round((b-a)*FPS))]+PR+[out],check=True)
+      lst.append(f"file 'p{n:03d}.mov'")
+  open("b/hdr/list.txt","w").write("\n".join(lst)+"\n")
+  subprocess.run(["ffmpeg","-loglevel","error","-y","-f","concat","-safe","0","-i","b/hdr/list.txt","-c","copy","b/hdr/cut.mov"],check=True)
 # 2) centred close-ups (same ranges as the SDR edit): split at zoom changes, crop+scale the close parts
 dur=float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0","b/hdr/cut.mov"]))
 end=min(dur,LIM) if LIM else dur
 # part transitions are done here on the 10-bit HLG frames (Remotion only draws the graphics): each transition window
 # becomes its own segment, so it costs no extra encode generation
-WIN={"whip":(0.15,0.15),"zoomin":(0.15,0.15),"dissolve":(0.0,0.4)}
+WIN={"whip":(0.15,0.15),"whipv":(0.15,0.15),"zoomin":(0.15,0.15),"dissolve":(0.0,0.4)}
 tw=[(round(round((tr["at"]-WIN[tr["type"]][0])*FPS)/FPS,4),round(round((tr["at"]+WIN[tr["type"]][1])*FPS)/FPS,4),tr) for tr in P.get("transitions",[])]
 pts=sorted({0.0,end}|{round(round(x*FPS)/FPS,4) for r in P["motion"]["jumpRanges"] for x in r[:2] if 0<x<end}|{x for a_,b_,_ in tw for x in (a_,b_) if 0<x<end})
 def tfx(tr,D):
@@ -35,6 +36,10 @@ def tfx(tr,D):
         dx=tr.get("dir",1)
         return (f"split=3[w1][w2][w3];[w1][w2][w3]hstack=3,crop=1080:1920:x='1080+{dx}*1080*{e}':y=0,"
                 f"gblur=sigma=22:sigmaV=0.6:enable='between(t,{D*0.2:.3f},{D*0.8:.3f})'")
+    if tr["type"]=="whipv":
+        dy=tr.get("dir",1)
+        return (f"split=3[w1][w2][w3];[w1][w2][w3]vstack=3,crop=1080:1920:x=0:y='1920+{dy}*1920*{e}',"
+                f"gblur=sigma=0.6:sigmaV=26:enable='between(t,{D*0.2:.3f},{D*0.8:.3f})'")
     if tr["type"]=="zoomin":
         z=f"(1+0.3*sin(PI*t/{D}))"
         return (f"scale=w='2*trunc(540*{z})':h='2*trunc(960*{z})':eval=frame:flags=bicubic,crop=1080:1920:(iw-1080)/2:(ih-1920)/2,"
