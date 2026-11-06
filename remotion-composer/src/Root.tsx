@@ -21,6 +21,7 @@ import {
   JirafikVlogProps,
   calculateJirafikVlogMetadata,
 } from "./JirafikVlog";
+import { DancingGiraffe } from "./DancingGiraffe";
 
 // ---------------------------------------------------------------------------
 // Theme System — prevents every video from looking like dark fintech
@@ -179,6 +180,15 @@ export const Root: React.FC = () => {
         height={1080}
         defaultProps={signalFromTomorrowWithMusicFixture}
         calculateMetadata={calculateCinematicMetadata}
+      />
+      <Composition
+        id="DancingGiraffe"
+        component={DancingGiraffe}
+        durationInFrames={240}
+        fps={60}
+        width={600}
+        height={800}
+        defaultProps={{ bpm: 120, transparent: true }}
       />
       <Composition
         id="TalkingHead"
