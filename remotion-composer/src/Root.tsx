@@ -22,6 +22,7 @@ import {
   calculateJirafikVlogMetadata,
 } from "./JirafikVlog";
 import { DancingGiraffe } from "./DancingGiraffe";
+import { MemeEdit, MemeEditProps } from "./MemeEdit";
 
 // ---------------------------------------------------------------------------
 // Theme System — prevents every video from looking like dark fintech
@@ -180,6 +181,16 @@ export const Root: React.FC = () => {
         height={1080}
         defaultProps={signalFromTomorrowWithMusicFixture}
         calculateMetadata={calculateCinematicMetadata}
+      />
+      <Composition
+        id="MemeEdit"
+        component={MemeEdit}
+        durationInFrames={600}
+        fps={60}
+        width={1080}
+        height={1920}
+        defaultProps={{ duration: 10, hook: { words: [], end: 0 }, cards: [], photos: [], colorWords: [], subs: [], scripts: [], emojis: [] } as MemeEditProps}
+        calculateMetadata={({ props }) => ({ durationInFrames: Math.ceil((props as MemeEditProps).duration * 60) })}
       />
       <Composition
         id="DancingGiraffe"
