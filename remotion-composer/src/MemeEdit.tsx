@@ -26,30 +26,46 @@ const fadeOut = (f: number, end: number, fps: number, d = 0.12) =>
 
 
 const Duck: React.FC<{ f: number; fps: number }> = ({ f, fps }) => {
+  // giraffe in the same round-emoji style as the reference duck: one brow raised, loading spinner on the forehead
   const spin = Math.floor((f / fps) * 12) % 12;
   return (
-    <svg viewBox="-180 -180 360 360" width={420} height={420}>
+    <svg viewBox="-200 -230 400 420" width={430} height={452}>
       <defs>
-        <radialGradient id="dk" cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stopColor="#FFE45C" />
-          <stop offset="70%" stopColor="#FFC21A" />
-          <stop offset="100%" stopColor="#F0A000" />
+        <radialGradient id="gf" cx="40%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#FFD873" />
+          <stop offset="70%" stopColor="#F4B23A" />
+          <stop offset="100%" stopColor="#DE9424" />
         </radialGradient>
       </defs>
-      <circle r={160} fill="url(#dk)" stroke="#E08A00" strokeWidth={6} />
-      <path d="M60 -128 A150 150 0 0 1 140 -40" stroke="#fff" strokeWidth={12} fill="none" strokeLinecap="round" opacity={0.75} />
+      {/* ossicones */}
+      <rect x={-78} y={-215} width={22} height={80} rx={11} fill="#E9A630" stroke="#B26A12" strokeWidth={5} transform="rotate(-12 -67 -140)" />
+      <rect x={56} y={-215} width={22} height={80} rx={11} fill="#E9A630" stroke="#B26A12" strokeWidth={5} transform="rotate(12 67 -140)" />
+      <circle cx={-82} cy={-212} r={20} fill="#6B3E14" />
+      <circle cx={82} cy={-212} r={20} fill="#6B3E14" />
+      {/* ears */}
+      <ellipse cx={-168} cy={-70} rx={46} ry={22} fill="#F4B23A" stroke="#B26A12" strokeWidth={5} transform="rotate(-25 -168 -70)" />
+      <ellipse cx={168} cy={-70} rx={46} ry={22} fill="#F4B23A" stroke="#B26A12" strokeWidth={5} transform="rotate(25 168 -70)" />
+      {/* face */}
+      <circle r={160} fill="url(#gf)" stroke="#B26A12" strokeWidth={6} />
+      <ellipse cx={-110} cy={-40} rx={22} ry={18} fill="#B8642A" opacity={0.75} />
+      <ellipse cx={118} cy={-20} rx={18} ry={15} fill="#B8642A" opacity={0.75} />
+      <ellipse cx={-120} cy={40} rx={14} ry={12} fill="#B8642A" opacity={0.75} />
+      <path d="M60 -128 A150 150 0 0 1 140 -40" stroke="#fff" strokeWidth={12} fill="none" strokeLinecap="round" opacity={0.6} />
       {[...Array(12)].map((_, i) => (
-        <rect key={i} x={-5} y={-62} width={10} height={26} rx={5} fill="#7A5A1E"
-          opacity={0.15 + 0.85 * (((i - spin + 12) % 12) / 11)} transform={`translate(-20 -55) rotate(${i * 30})`} />
+        <rect key={i} x={-5} y={-62} width={10} height={26} rx={5} fill="#6B4A16"
+          opacity={0.15 + 0.85 * (((i - spin + 12) % 12) / 11)} transform={`translate(-10 -62) rotate(${i * 30})`} />
       ))}
-      <path d="M-100 18 L-38 34" stroke="#111" strokeWidth={10} strokeLinecap="round" />
-      <path d="M38 6 Q70 -22 100 4" stroke="#111" strokeWidth={10} fill="none" strokeLinecap="round" />
-      <ellipse cx={-62} cy={62} rx={20} ry={24} fill="#111" />
-      <ellipse cx={62} cy={58} rx={20} ry={24} fill="#111" />
-      <circle cx={-56} cy={54} r={6} fill="#fff" />
-      <circle cx={68} cy={50} r={6} fill="#fff" />
-      <path d="M-70 112 Q0 82 70 112 Q60 150 0 150 Q-60 150 -70 112 Z" fill="#FF8A1E" stroke="#D2600A" strokeWidth={5} />
-      <path d="M-62 114 Q0 100 62 114" stroke="#D2600A" strokeWidth={4} fill="none" />
+      <path d="M-100 8 L-38 24" stroke="#2A1608" strokeWidth={10} strokeLinecap="round" />
+      <path d="M38 -4 Q70 -32 100 -6" stroke="#2A1608" strokeWidth={10} fill="none" strokeLinecap="round" />
+      <ellipse cx={-62} cy={48} rx={19} ry={23} fill="#1A1A1A" />
+      <ellipse cx={62} cy={44} rx={19} ry={23} fill="#1A1A1A" />
+      <circle cx={-56} cy={40} r={6} fill="#fff" />
+      <circle cx={68} cy={36} r={6} fill="#fff" />
+      {/* snout */}
+      <ellipse cx={0} cy={112} rx={88} ry={50} fill="#FBE3B0" stroke="#B26A12" strokeWidth={5} />
+      <ellipse cx={-28} cy={104} rx={9} ry={12} fill="#5A3416" />
+      <ellipse cx={28} cy={104} rx={9} ry={12} fill="#5A3416" />
+      <path d="M-30 138 Q0 148 34 134" stroke="#5A3416" strokeWidth={6} fill="none" strokeLinecap="round" />
     </svg>
   );
 };
@@ -122,7 +138,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
             const e = p.hook.emoji!;
             const sp = spring({ frame: at(e.t), fps, config: { damping: 9, stiffness: 260 } });
             return (
-              <div style={{ position: "absolute", left: 300, top: 690, transform: `scale(${sp}) rotate(${Math.sin(at(e.t) * 0.5) * 4}deg)` }}>
+              <div style={{ position: "absolute", left: 285, top: 640, transform: `scale(${sp}) rotate(${Math.sin(at(e.t) * 0.5) * 4}deg)` }}>
                 <Duck f={at(e.t)} fps={fps} />
               </div>
             );
