@@ -1,14 +1,151 @@
 {
  "duration": 19.6,
- "hook": {"words": [{"t":0.5,"text":"РКО","size":250},{"t":1.95,"text":"ЭТО","size":250},{"t":3.45,"text":"НУ КАК ТАМ","size":150}],
-          "end": 5.55, "emoji": {"t":3.5,"char":"😤"}},
- "cards": [{"start":5.55,"end":8.75,"script":{"t":5.6,"text":"Короче"},
-            "lines":[{"t":6.65,"text":"это не то,"},{"t":7.1,"text":"что вы там"},{"t":7.6,"text":"думаете"}]}],
- "photos": [{"start":8.75,"end":9.42,"src":"meme13/bad1.jpg"},{"start":9.42,"end":9.92,"src":"meme13/bad2.jpg"},{"start":9.92,"end":11.4,"src":"meme13/bad3.jpg"},
-            {"start":15.3,"end":16.15,"src":"meme13/good1.jpg"},{"start":16.15,"end":16.9,"src":"meme13/good2.jpg"},{"start":16.9,"end":18.35,"src":"meme13/good3.jpg"}],
- "colorWords": [{"start":9.0,"end":9.42,"text":"плохое","color":"#E3191C"},{"start":9.45,"end":9.92,"text":"там","color":"#E3191C"},{"start":9.95,"end":11.4,"text":"всё дела","color":"#E3191C"},
-                {"start":15.35,"end":16.15,"text":"на самом-то деле","color":"#2EE05A","size":120},{"start":16.9,"end":17.35,"text":"нормально","color":"#2EE05A"},{"start":17.35,"end":18.35,"text":"нормально всё","color":"#2EE05A"}],
- "subs": [{"start":11.7,"end":13.85,"text":"РКО — оно же это..."},{"start":18.55,"end":19.6,"text":"думаю, вы поняли"}],
- "scripts": [{"start":13.95,"end":15.25,"text":"вот так вот","color":"#111"}],
- "emojis": [{"t":18.9,"end":19.6,"char":"😏","x":620,"y":1050,"size":170}]
+ "hook": {
+  "words": [
+   {
+    "t": 0.5,
+    "text": "РКО",
+    "size": 560
+   },
+   {
+    "t": 1.95,
+    "text": "ЭТО",
+    "size": 560
+   },
+   {
+    "t": 3.45,
+    "text": "НУ КАК ТАМ",
+    "size": 330
+   }
+  ],
+  "end": 5.55,
+  "emoji": {
+   "t": 3.5,
+   "char": "😤"
+  }
+ },
+ "cards": [
+  {
+   "start": 5.55,
+   "end": 8.75,
+   "script": {
+    "t": 5.6,
+    "text": "Короче"
+   },
+   "lines": [
+    {
+     "t": 6.65,
+     "text": "это не то,"
+    },
+    {
+     "t": 7.1,
+     "text": "что вы там"
+    },
+    {
+     "t": 7.6,
+     "text": "думаете"
+    }
+   ]
+  }
+ ],
+ "photos": [
+  {
+   "start": 8.75,
+   "end": 9.42,
+   "src": "meme13/bad1.jpg"
+  },
+  {
+   "start": 9.42,
+   "end": 9.92,
+   "src": "meme13/bad2.jpg"
+  },
+  {
+   "start": 9.92,
+   "end": 11.4,
+   "src": "meme13/bad3.jpg"
+  },
+  {
+   "start": 15.3,
+   "end": 16.15,
+   "src": "meme13/good1.jpg"
+  },
+  {
+   "start": 16.15,
+   "end": 16.9,
+   "src": "meme13/good2.jpg"
+  },
+  {
+   "start": 16.9,
+   "end": 18.35,
+   "src": "meme13/good3.jpg"
+  }
+ ],
+ "colorWords": [
+  {
+   "start": 9.0,
+   "end": 9.42,
+   "text": "плохое",
+   "color": "#E3191C"
+  },
+  {
+   "start": 9.45,
+   "end": 9.92,
+   "text": "там",
+   "color": "#E3191C"
+  },
+  {
+   "start": 9.95,
+   "end": 11.4,
+   "text": "всё дела",
+   "color": "#E3191C"
+  },
+  {
+   "start": 15.35,
+   "end": 16.15,
+   "text": "на самом-то деле",
+   "color": "#2EE05A",
+   "size": 125
+  },
+  {
+   "start": 16.9,
+   "end": 17.35,
+   "text": "нормально",
+   "color": "#2EE05A"
+  },
+  {
+   "start": 17.35,
+   "end": 18.35,
+   "text": "нормально всё",
+   "color": "#2EE05A"
+  }
+ ],
+ "subs": [
+  {
+   "start": 11.7,
+   "end": 13.85,
+   "text": "РКО — оно же это..."
+  },
+  {
+   "start": 18.55,
+   "end": 19.6,
+   "text": "думаю, вы поняли"
+  }
+ ],
+ "scripts": [
+  {
+   "start": 13.95,
+   "end": 15.25,
+   "text": "вот так вот"
+  }
+ ],
+ "emojis": [
+  {
+   "t": 18.9,
+   "end": 19.6,
+   "char": "😏",
+   "x": 620,
+   "y": 1050,
+   "size": 170
+  }
+ ]
 }

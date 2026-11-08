@@ -34,6 +34,9 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       <style>{`@font-face{font-family:'Marck';src:url(${staticFile("jirafik/MarckScript-cyr.woff2")}) format('woff2');unicode-range:U+0400-04FF;}
 @font-face{font-family:'Marck';src:url(${staticFile("jirafik/MarckScript-lat.woff2")}) format('woff2');}`}</style>
 
+      {/* dark vignette on the speaker shots, like the reference footage */}
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 55%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%), linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3))" }} />
+
       {/* photo inserts (full screen, hard cuts) */}
       {p.photos.map((ph, i) =>
         t >= ph.start && t < ph.end ? (
@@ -49,9 +52,9 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
         const inn = interpolate(at(c.start), [0, 0.12 * fps], [0, 1], { extrapolateRight: "clamp" });
         const out = fadeOut(frame, c.end, fps, 0.25);
         return (
-          <AbsoluteFill key={`c${i}`} style={{ backgroundColor: "#F2F2F2", opacity: Math.min(inn, out), alignItems: "center", paddingTop: 560 }}>
+          <AbsoluteFill key={`c${i}`} style={{ backgroundColor: "#F2F2F2", opacity: Math.min(inn, out), alignItems: "center", paddingTop: 430 }}>
             {t >= c.script.t && (
-              <div style={{ fontFamily: "Marck, cursive", fontSize: 190, color: "#111", lineHeight: 1, ...blurIn(at(c.script.t), fps, 0.35),
+              <div style={{ fontFamily: "Marck, cursive", fontSize: 330, color: "#111", lineHeight: 1, ...blurIn(at(c.script.t), fps, 0.35),
                 transform: `scale(${interpolate(at(c.script.t), [0, 0.35 * fps], [0.8, 1], { extrapolateRight: "clamp" })})` }}>
                 {c.script.text}
               </div>
@@ -59,7 +62,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
             <div style={{ marginTop: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               {c.lines.map((l, j) =>
                 t >= l.t ? (
-                  <div key={j} style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 104, lineHeight: 1.05, color: j === c.lines.length - 1 ? "#5A0E0E" : "#A3171A", ...blurIn(at(l.t), fps) }}>
+                  <div key={j} style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 150, lineHeight: 1.04, color: j === c.lines.length - 1 ? "#5A0E0E" : "#A3171A", ...blurIn(at(l.t), fps) }}>
                     {l.text}
                   </div>
                 ) : null,
@@ -69,25 +72,31 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
         );
       })}
 
-      {/* hook: big red stacked words */}
+      {/* hook: huge red stacked words over a darkened picture, like the reference */}
       {t < p.hook.end && (
-        <AbsoluteFill style={{ alignItems: "center", paddingTop: 150, opacity: fadeOut(frame, p.hook.end, fps) }}>
-          {p.hook.words.map((w, i) => {
-            if (t < w.t) return <div key={i} style={{ height: w.size * 1.02 }} />;
-            const s = spring({ frame: at(w.t), fps, config: { damping: 12, stiffness: 320 } });
-            return (
-              <div key={i} style={{ fontFamily: "Oswald", fontWeight: 700, fontSize: w.size, lineHeight: 1.02, color: RED, letterSpacing: -2,
-                transform: `scale(${1.35 - 0.35 * s})`, opacity: Math.min(1, s * 2), textShadow: "0 6px 18px rgba(0,0,0,0.35)" }}>
-                {w.text}
-              </div>
-            );
-          })}
+        <AbsoluteFill style={{ opacity: fadeOut(frame, p.hook.end, fps) }}>
+          <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.15) 100%)" }} />
+          <svg viewBox="0 0 1080 1920" width="100%" height="100%" style={{ position: "absolute" }}>
+            {p.hook.words.map((w, i) => {
+              if (t < w.t) return null;
+              const sp = spring({ frame: at(w.t), fps, config: { damping: 12, stiffness: 320 } });
+              const ys = [600, 1225, 1680];
+              const fit = w.text.length > 4 ? 1010 : undefined;
+              return (
+                <text key={i} x={540} y={ys[i]} textAnchor="middle" fontFamily="Oswald" fontWeight={700} fontSize={w.size} fill={RED}
+                  {...(fit ? { textLength: fit, lengthAdjust: "spacingAndGlyphs" } : {})}
+                  style={{ transformOrigin: `540px ${ys[i] - w.size * 0.35}px`, transform: `scale(${1.3 - 0.3 * sp})`, opacity: Math.min(1, sp * 2),
+                    filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.5))" }}>
+                  {w.text}
+                </text>
+              );
+            })}
+          </svg>
           {p.hook.emoji && t >= p.hook.emoji.t && (() => {
             const e = p.hook.emoji!;
-            const s = spring({ frame: at(e.t), fps, config: { damping: 9, stiffness: 260 } });
-            const shake = Math.sin(at(e.t) * 0.9) * 10;
+            const sp = spring({ frame: at(e.t), fps, config: { damping: 9, stiffness: 260 } });
             return (
-              <div style={{ position: "absolute", top: 330, fontSize: 210, transform: `scale(${s}) rotate(${shake}deg)`, fontFamily: "Noto Color Emoji" }}>{e.char}</div>
+              <div style={{ position: "absolute", left: 360, top: 820, fontSize: 330, lineHeight: 1, transform: `scale(${sp}) rotate(${Math.sin(at(e.t) * 0.9) * 10}deg)`, fontFamily: "Noto Color Emoji" }}>{e.char}</div>
             );
           })()}
         </AbsoluteFill>
@@ -96,9 +105,9 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       {/* coloured words over photos / video */}
       {p.colorWords.map((w, i) =>
         t >= w.start && t < w.end ? (
-          <AbsoluteFill key={`w${i}`} style={{ alignItems: "center", paddingTop: w.top ?? 1180 }}>
-            <div style={{ fontFamily: "Oswald", fontWeight: 700, fontSize: w.size ?? 150, color: w.color, lineHeight: 1, textAlign: "center",
-              textShadow: "0 4px 16px rgba(0,0,0,0.45)", WebkitTextStroke: "5px #111", paintOrder: "stroke fill", ...blurIn(at(w.start), fps, 0.18), opacity: Math.min(blurIn(at(w.start), fps, 0.18).opacity, fadeOut(frame, w.end, fps)) }}>
+          <AbsoluteFill key={`w${i}`} style={{ alignItems: "center", paddingTop: w.top ?? 860 }}>
+            <div style={{ fontFamily: "Oswald", fontWeight: 700, fontSize: w.size ?? 170, color: w.color, lineHeight: 1, textAlign: "center",
+              textShadow: "0 4px 16px rgba(0,0,0,0.45)", ...blurIn(at(w.start), fps, 0.18), opacity: Math.min(blurIn(at(w.start), fps, 0.18).opacity, fadeOut(frame, w.end, fps)) }}>
               {w.text}
             </div>
           </AbsoluteFill>
@@ -108,8 +117,8 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       {/* handwritten words over the video */}
       {p.scripts.map((s, i) =>
         t >= s.start && t < s.end ? (
-          <AbsoluteFill key={`s${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 1150 }}>
-            <div style={{ fontFamily: "Marck, cursive", fontSize: 180, color: s.color ?? "#fff", lineHeight: 1, textShadow: s.color === "#111" ? "0 0 18px rgba(255,255,255,0.95), 0 0 6px #fff" : "0 4px 20px rgba(0,0,0,0.6)",
+          <AbsoluteFill key={`s${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 760 }}>
+            <div style={{ fontFamily: "Marck, cursive", fontSize: 230, color: s.color ?? "#fff", lineHeight: 1, whiteSpace: "nowrap", textShadow: s.color === "#111" ? "0 0 18px rgba(255,255,255,0.95), 0 0 6px #fff" : "0 4px 20px rgba(0,0,0,0.6)",
               ...blurIn(at(s.start), fps, 0.3), opacity: Math.min(blurIn(at(s.start), fps, 0.3).opacity, fadeOut(frame, s.end, fps)) }}>
               {s.text}
             </div>
@@ -120,8 +129,8 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       {/* small grey subtitles */}
       {p.subs.map((s, i) =>
         t >= s.start && t < s.end ? (
-          <AbsoluteFill key={`u${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 1220 }}>
-            <div style={{ fontFamily: "Oswald", fontWeight: 600, fontSize: 64, color: "#D9D9D9", textShadow: "0 2px 10px rgba(0,0,0,0.7)",
+          <AbsoluteFill key={`u${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 900 }}>
+            <div style={{ fontFamily: "Oswald", fontWeight: 600, fontSize: 92, color: "rgba(225,225,225,0.85)", textShadow: "0 2px 10px rgba(0,0,0,0.7)",
               ...blurIn(at(s.start), fps, 0.25), opacity: Math.min(blurIn(at(s.start), fps, 0.25).opacity, fadeOut(frame, s.end, fps)) }}>
               {s.text}
             </div>
