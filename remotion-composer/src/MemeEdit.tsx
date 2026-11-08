@@ -79,9 +79,9 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
         const inn = interpolate(at(c.start), [0, 0.12 * fps], [0, 1], { extrapolateRight: "clamp" });
         const out = fadeOut(frame, c.end, fps, 0.25);
         return (
-          <AbsoluteFill key={`c${i}`} style={{ backgroundColor: "#F2F2F2", opacity: Math.min(inn, out), alignItems: "center", paddingTop: 430 }}>
+          <AbsoluteFill key={`c${i}`} style={{ backgroundColor: "#F2F2F2", opacity: Math.min(inn, out), alignItems: "center", paddingTop: 470, paddingRight: 100 }}>
             {t >= c.script.t && (
-              <div style={{ fontFamily: "Marck, cursive", fontSize: 330, color: "#111", lineHeight: 1, ...blurIn(at(c.script.t), fps, 0.35),
+              <div style={{ fontFamily: "Marck, cursive", fontSize: 255, color: "#111", lineHeight: 1, ...blurIn(at(c.script.t), fps, 0.35),
                 transform: `scale(${interpolate(at(c.script.t), [0, 0.35 * fps], [0.8, 1], { extrapolateRight: "clamp" })})` }}>
                 {c.script.text}
               </div>
@@ -89,7 +89,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
             <div style={{ marginTop: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               {c.lines.map((l, j) =>
                 t >= l.t ? (
-                  <div key={j} style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 150, lineHeight: 1.04, color: j === c.lines.length - 1 ? "#5A0E0E" : "#A3171A", ...blurIn(at(l.t), fps) }}>
+                  <div key={j} style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 118, lineHeight: 1.06, color: j === c.lines.length - 1 ? "#5A0E0E" : "#A3171A", ...blurIn(at(l.t), fps) }}>
                     {l.text}
                   </div>
                 ) : null,
@@ -106,12 +106,12 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
             {p.hook.words.map((w, i) => {
               if (t < w.t) return null;
               const sp = spring({ frame: at(w.t), fps, config: { damping: 12, stiffness: 320 } });
-              const ys = [600, 1225, 1680];
-              const fit = w.text.length > 4 ? 1010 : undefined;
+              const ys = [640, 1090, 1400]; // inside the TikTok safe zone (top bar, right buttons, caption at the bottom)
+              const fit = w.text.length > 4 ? 820 : undefined;
               return (
-                <text key={i} x={540} y={ys[i]} textAnchor="middle" fontFamily="Oswald" fontWeight={700} fontSize={w.size} fill={RED}
+                <text key={i} x={490} y={ys[i]} textAnchor="middle" fontFamily="Oswald" fontWeight={700} fontSize={w.size} fill={RED}
                   {...(fit ? { textLength: fit, lengthAdjust: "spacingAndGlyphs" } : {})}
-                  style={{ transformOrigin: `540px ${ys[i] - w.size * 0.35}px`, transform: `scale(${1.3 - 0.3 * sp})`, opacity: Math.min(1, sp * 2),
+                  style={{ transformOrigin: `490px ${ys[i] - w.size * 0.35}px`, transform: `scale(${1.3 - 0.3 * sp})`, opacity: Math.min(1, sp * 2),
                     filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.5))" }}>
                   {w.text}
                 </text>
@@ -122,7 +122,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
             const e = p.hook.emoji!;
             const sp = spring({ frame: at(e.t), fps, config: { damping: 9, stiffness: 260 } });
             return (
-              <div style={{ position: "absolute", left: 330, top: 760, transform: `scale(${sp}) rotate(${Math.sin(at(e.t) * 0.5) * 4}deg)` }}>
+              <div style={{ position: "absolute", left: 300, top: 690, transform: `scale(${sp}) rotate(${Math.sin(at(e.t) * 0.5) * 4}deg)` }}>
                 <Duck f={at(e.t)} fps={fps} />
               </div>
             );
@@ -133,7 +133,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       {/* coloured words over photos / video */}
       {p.colorWords.map((w, i) =>
         t >= w.start && t < w.end ? (
-          <AbsoluteFill key={`w${i}`} style={{ alignItems: "center", paddingTop: w.top ?? 860 }}>
+          <AbsoluteFill key={`w${i}`} style={{ alignItems: "center", paddingTop: w.top ?? 860, paddingRight: 100 }}>
             <div style={{ fontFamily: "Oswald", fontWeight: 700, fontSize: w.size ?? 170, color: w.color, lineHeight: 1, textAlign: "center",
               textShadow: "0 0 3px rgba(0,0,0,0.9), 0 4px 18px rgba(0,0,0,0.7)", ...blurIn(at(w.start), fps, 0.18), opacity: Math.min(blurIn(at(w.start), fps, 0.18).opacity, fadeOut(frame, w.end, fps)) }}>
               {w.text}
@@ -157,7 +157,7 @@ export const MemeEdit: React.FC<MemeEditProps> = (p) => {
       {/* small grey subtitles */}
       {p.subs.map((s, i) =>
         t >= s.start && t < s.end ? (
-          <AbsoluteFill key={`u${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 900 }}>
+          <AbsoluteFill key={`u${i}`} style={{ alignItems: "center", paddingTop: s.top ?? 900, paddingRight: 100 }}>
             <div style={{ fontFamily: "Oswald", fontWeight: 600, fontSize: 92, color: "rgba(225,225,225,0.85)", textShadow: "0 2px 10px rgba(0,0,0,0.7)",
               ...blurIn(at(s.start), fps, 0.25), opacity: Math.min(blurIn(at(s.start), fps, 0.25).opacity, fadeOut(frame, s.end, fps)) }}>
               {s.text}
