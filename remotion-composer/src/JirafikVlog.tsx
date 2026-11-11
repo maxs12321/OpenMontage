@@ -169,6 +169,7 @@ export type JirafikVlogProps = {
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
   transitions?: { at: number; type: "whip" | "zoomin" | "blurin" | "dissolve" | "flash" | "stretch" | "click" | "glitch"; dir?: 1 | -1 }[];
+  captionPlates?: [number, number][]; // time ranges where plain caption words get a navy pill (B-roll with text)
   showProgress?: boolean; // orange progress bar at the top (default on)
   // render only the graphics on a transparent background (the HDR video is composited later with ffmpeg)
   overlayOnly?: boolean;
@@ -712,10 +713,10 @@ const Note: React.FC<{ n: NonNullable<JirafikVlogProps["notes"]>[number] }> = ({
   const total = (n.end - n.start) * fps;
   const out = interpolate(frame, [total - 6, total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: Math.max(360, n.top ?? 360), opacity: out }}>
+    <AbsoluteFill style={{ alignItems: "center", top: Math.max(360, n.top ?? 360), opacity: out, transform: "translateX(-50px)" }}>
       <div style={{ transform: `scale(${0.3 + 0.7 * v})`, opacity: Math.min(1, v * 1.6), background: "#fff", color: NAVY, fontFamily: BODY, fontWeight: 800,
         fontSize: 54, padding: "16px 34px", borderRadius: 24, boxShadow: "0 14px 36px rgba(20,24,58,0.3)", border: `5px solid ${ORANGE}`,
-        maxWidth: 900, textAlign: "center", lineHeight: 1.15 }}>
+        maxWidth: 840, textAlign: "center", lineHeight: 1.15 }}>
         {n.text}
       </div>
     </AbsoluteFill>
@@ -903,7 +904,8 @@ const wordAnim = (anim: WordAnim | undefined, wf: number, fps: number, text: str
   return r;
 };
 
-const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" | "word" }> = ({
+const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | "bold" | "word"; plates?: [number, number][] }> = ({
+  plates,
   words,
   from,
   variant = "plate",
@@ -961,6 +963,10 @@ const Captions: React.FC<{ words: VlogWord[]; from: number; variant?: "plate" | 
               fontSize: 62,
               lineHeight: 1.15,
               textShadow: "0 2px 10px rgba(0,0,0,0.45)",
+              // over B-roll with text on screen (laptop, documents): navy pill so the word never sits on other text
+              ...((plates ?? []).some(([a0, b0]) => t >= a0 && t < b0)
+                ? { background: "rgba(20,24,58,0.9)", textShadow: "none", padding: "2px 20px 6px", borderRadius: 10 }
+                : {}),
             }}
           >
             {text}
@@ -1502,7 +1508,7 @@ export const JirafikVlog: React.FC<JirafikVlogProps> = (p) => {
             <Cta c={p.cta} light={p.plateTheme === "light"} />
           </Sequence>
         )}
-        <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} />
+        <Captions words={p.words} from={p.captionsFrom} variant={p.captionStyle} plates={p.captionPlates} />
         {p.reveal && (
           <Sequence from={f(p.reveal.start)} durationInFrames={f(p.reveal.duration)}>
             <Reveal r={p.reveal} light={p.plateTheme === "light"} />
