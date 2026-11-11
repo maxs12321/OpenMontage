@@ -163,6 +163,8 @@ export type JirafikVlogProps = {
     stamp?: { at: number; text: string };
     blur?: boolean;      // blur the picture behind (only over shots without the speaker)
     columns?: 1 | 2;     // 2 = compact card above the speaker's head
+    width?: number;      // card width (default 980 / 940); with shiftX keeps it inside the TikTok safe zone
+    shiftX?: number;
   };
   // Small white pills over the picture (e.g. «1 клиент → 4 заявки»)
   notes?: { start: number; end: number; text: string; top?: number }[];
@@ -508,7 +510,7 @@ const HookLower: React.FC<{ hook: JirafikVlogProps["hook"] }> = ({ hook }) => {
   return (
     <AbsoluteFill style={{ opacity: out }}>
       <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(10,12,30,0) 45%, rgba(10,12,30,0.55) 100%)" }} />
-      <div style={{ position: "absolute", left: 70, right: 70, bottom: 330 }}>
+      <div style={{ position: "absolute", left: 70, right: 160, bottom: 440 }}>
         {hook.teaser && (
           <div style={{ fontFamily: BODY, fontStyle: "italic", fontWeight: 600, fontSize: 40, color: "#fff", textShadow: shadow, opacity: kick, marginBottom: 6 }}>
             {hook.teaser}
@@ -744,7 +746,7 @@ const Board: React.FC<{ b: NonNullable<JirafikVlogProps["boards"]>[number] }> = 
   return (
     <AbsoluteFill style={{ opacity: out }}>
       {b.blur && <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />}
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 340, gap: 24 }}>
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 340, gap: 24, transform: "translateX(-50px)" }}>
         {b.blocks.map((k, i) => {
           if (t < k.at) return null;
           const f = (t - k.at) * fps;
@@ -753,7 +755,7 @@ const Board: React.FC<{ b: NonNullable<JirafikVlogProps["boards"]>[number] }> = 
           const prog = interpolate(f, [4, 26], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
           const val = k.count !== undefined ? Math.round(k.count * (1 - Math.pow(1 - prog, 3))).toLocaleString("ru-RU").replace(/ /g, " ") + (k.suffix ?? "") : k.value;
           return (
-            <div key={i} style={{ position: "relative", width: 900, transform: `translateY(${(1 - inn) * 260}px)`, opacity: Math.min(1, inn * 1.4) * (k.crossAt !== undefined && t >= k.crossAt ? 1 - 0.35 * cross : 1),
+            <div key={i} style={{ position: "relative", width: 840, transform: `translateY(${(1 - inn) * 260}px)`, opacity: Math.min(1, inn * 1.4) * (k.crossAt !== undefined && t >= k.crossAt ? 1 - 0.35 * cross : 1),
               background: "#fff", borderRadius: 28, padding: "24px 30px", boxShadow: "0 16px 44px rgba(20,24,58,0.22)",
               border: `6px solid ${k.tone === "good" ? ORANGE : k.tone === "bad" ? "#E5484D" : "transparent"}`, display: "flex", gap: 22, alignItems: "center" }}>
               {k.icon && <Icon name={k.icon} />}
@@ -810,8 +812,8 @@ const PayoutTable: React.FC<{ tb: NonNullable<JirafikVlogProps["table"]> }> = ({
   return (
     <AbsoluteFill style={{ opacity: Math.min(inn, out) }}>
       {tb.blur && <AbsoluteFill style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(245,245,247,0.35)" }} />}
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 330 }}>
-        <div style={{ position: "relative", width: two ? 980 : 940, background: "rgba(255,255,255,0.96)", borderRadius: 28, padding: two ? "18px 26px 20px" : "28px 34px 30px",
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 330, transform: `translateX(${tb.shiftX ?? 0}px)` }}>
+        <div style={{ position: "relative", width: tb.width ?? (two ? 980 : 940), background: "rgba(255,255,255,0.96)", borderRadius: 28, padding: two ? "18px 26px 20px" : "28px 34px 30px",
           boxShadow: "0 18px 50px rgba(20,24,58,0.28)", transform: `translateY(${(1 - inn) * -160}px)` }}>
           <div style={{ fontFamily: BODY, fontWeight: 800, fontSize: two ? 28 : 36, color: "#2E4F8F", marginBottom: 6 }}>{tb.title}</div>
           {two ? (
@@ -1350,9 +1352,10 @@ const Cta: React.FC<{ c: NonNullable<JirafikVlogProps["cta"]>; light?: boolean }
   const { fps } = useVideoConfig();
   const inn = spring({ frame, fps, config: { damping: 12, stiffness: 170 } });
   return (
-    <AbsoluteFill style={{ alignItems: "center", top: 380 }}>
+    <AbsoluteFill style={{ alignItems: "center", top: 380, transform: "translateX(-50px)" }}>
       <div
         style={{
+          maxWidth: 850,
           transform: `scale(${0.7 + 0.3 * inn})`,
           opacity: inn,
           background: light ? "rgba(255,255,255,0.95)" : "rgba(20,24,58,0.94)",

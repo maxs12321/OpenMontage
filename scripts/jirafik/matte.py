@@ -8,7 +8,7 @@ FPS=subprocess.check_output(["ffprobe","-v","error","-select_streams","v:0","-sh
 fpsf=eval(FPS)
 sess=ort.InferenceSession("/home/user/models/rvm/rvm_mobilenetv3_fp32.onnx", providers=["CPUExecutionProvider"])
 rec=[np.zeros([1,1,1,1],np.float32)]*4; ds=np.array([0.25],np.float32)
-rd=subprocess.Popen(["ffmpeg","-loglevel","error","-i",src,"-f","rawvideo","-pix_fmt","rgb24","-"],stdout=subprocess.PIPE)
+rd=subprocess.Popen(["ffmpeg","-loglevel","error","-i",src,"-vf",f"scale={W}:{H}:flags=lanczos","-f","rawvideo","-pix_fmt","rgb24","-"],stdout=subprocess.PIPE)
 wr=subprocess.Popen(["ffmpeg","-loglevel","error","-y","-f","rawvideo","-pix_fmt","rgba","-s",f"{W}x{H}","-r",FPS,"-i","-",
   "-c:v","libvpx-vp9","-pix_fmt","yuva420p","-b:v","0","-crf","28","-deadline","realtime","-cpu-used","8","-row-mt","1","-auto-alt-ref","0",out],stdin=subprocess.PIPE)
 n=0; t0=time.time()
