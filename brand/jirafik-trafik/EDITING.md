@@ -49,7 +49,7 @@
 
 ## Подготовка новой сессии (облако чистое после перезапуска)
 
-1. `make setup`, затем `.venv/bin/pip install faster-whisper sherpa-onnx pillow-heif`.
+1. `make setup`, затем `.venv/bin/python -m pip install faster-whisper sherpa-onnx pillow-heif onnxruntime` (в .venv нет pip-бинарника).
 2. Модели (с GitHub, Hugging Face заблокирован):
    - речь RU с таймингами слов: `sherpa-onnx-nemo-transducer-giga-am-v2-russian-2025-04-19` → `/home/user/models/`;
    - Whisper turbo (сверка текста): `sherpa-onnx-whisper-turbo`; VAD: `silero_vad.onnx`;
