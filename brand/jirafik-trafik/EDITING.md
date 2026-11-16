@@ -60,7 +60,7 @@
    - Whisper turbo (сверка текста): `sherpa-onnx-whisper-turbo`; VAD: `silero_vad.onnx`;
    - вырезка человека: `rvm_mobilenetv3_fp32.onnx` (PeterL1n/RobustVideoMatting) → `/home/user/models/rvm/`.
 3. Шрифты: `cp brand/jirafik-trafik/fonts/*.ttf ~/.fonts/ && fc-cache -f`.
-4. Remotion рендерить с `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
+4. Remotion рендерить с `--browser-executable=$(find /opt/pw-browsers -name chrome-headless-shell -type f | head -1)` (версия браузера в облаке меняется).
 5. Скрипты: `scripts/jirafik/` (asr.py, giga.py, matte.py, headpos.py, пример props_example_banks.py).
 6. Звуки (`remotion-composer/public/jirafik/sfx2-*`, `sfx3-*`) вырезаны из обучающих видео Ильи —
    в git их нет; если пропали, попросить Илью прислать обучающие ролики со звуками заново.
